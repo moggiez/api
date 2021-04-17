@@ -20,3 +20,9 @@ resource "aws_api_gateway_integration" "_" {
   type = "AWS_PROXY"
   uri  = var.lambda.invoke_arn
 }
+
+module "proxy_cors" {
+  source          = "../api_gateway_enable_cors"
+  api_id          = var.api.id
+  api_resource_id = aws_api_gateway_resource._.id
+}

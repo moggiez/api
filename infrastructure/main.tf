@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
     }
   }
 
@@ -15,6 +15,11 @@ terraform {
 
 provider "aws" {
   region = var.region
+}
+
+provider "aws" {
+  alias  = "acm_provider"
+  region = "us-east-1"
 }
 
 resource "aws_s3_bucket" "api_bucket" {

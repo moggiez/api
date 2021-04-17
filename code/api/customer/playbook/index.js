@@ -8,34 +8,41 @@ const dynamoDB = new AWS.DynamoDB({
 const tableName = "playbooks";
 
 const response = (status, body, headers, callback) => {
-  callback(null, {
+  const httpResponse = {
     statusCode: status,
     body: JSON.stringify(body),
     headers: headers,
-  });
+  };
+  console.log("httpResponse", httpResponse);
+  callback(null, httpResponse);
+};
+
+const headers = {
+  "Content-Type": "application/json",
+  "Access-Control-Allow-Origin": "*",
 };
 
 exports.handler = function (event, context, callback) {
-  const headers = {
-    "Content-Type": "text/plain",
-    "Access-Control-Allow-Origin": "*",
-  };
-  response(200, event, headers, callback);
-  const body = JSON.parse(event.body);
+  const pathParameters = event.pathParameters;
+  const proxy = pathParameters.proxy;
   const params = {
-    TableName: "Restaurants",
-    KeyConditionExpression: "customerId = :customerId",
     ExpressionAttributeValues: {
-      ":customerId": body.customerId,
+      ":customerId": { S: proxy },
     },
+    KeyConditionExpression: "customerId = :customerId",
+    TableName: "playbooks",
   };
   dynamoDB.query(params, (err, data) => {
     if (err) {
       console.log(err);
       response(500, err, headers, callback);
     } else {
-      console.log(`Data is ${data}`);
-      response(200, err, data, callback);
+      console.log(`Data is ${JSON.stringify(data)}`);
+      const responseBody = {
+        data: data.Items,
+      };
+      console.log(`Data is ${JSON.stringify(responseBody)}`);
+      response(200, responseBody, headers, callback);
     }
   });
 };
