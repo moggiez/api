@@ -1,4 +1,8 @@
 variable "name" {
+  type = string
+}
+
+variable "api" {
 
 }
 

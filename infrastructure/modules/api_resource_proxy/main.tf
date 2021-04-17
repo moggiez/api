@@ -1,6 +1,6 @@
 resource "aws_api_gateway_resource" "_" {
-  path_part   = var.resource_path_part
-  parent_id   = var.api.root_resource_id
+  path_part   = "{proxy+}"
+  parent_id   = var.parent_api_resource.id
   rest_api_id = var.api.id
 }
 

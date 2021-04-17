@@ -2,6 +2,14 @@ variable "name" {
   type = string
 }
 
+variable "api" {
+
+}
+
+variable "parent_api_resource" {
+  default = null
+}
+
 variable "path_part" {
   type = string
 }

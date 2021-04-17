@@ -18,6 +18,7 @@ module "lambda_for_api" {
 module "gateway_to_lambda" {
   source             = "../lambda_gateway"
   name               = "${var.name}_API"
+  api                = var.api
   lambda             = module.lambda_for_api.lambda
   http_method        = "GET"
   resource_path_part = var.path_part
@@ -25,7 +26,7 @@ module "gateway_to_lambda" {
 
 module "gateway_cors" {
   source          = "../api_gateway_enable_cors"
-  api_id          = module.gateway_to_lambda.api.id
+  api_id          = var.api.id
   api_resource_id = module.gateway_to_lambda.api_resource.id
 }
 
@@ -35,5 +36,5 @@ resource "aws_lambda_permission" "_" {
   function_name = module.lambda_for_api.lambda.function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn = "${module.gateway_to_lambda.api.execution_arn}/*/*"
+  source_arn = "${var.api.execution_arn}/*/*"
 }

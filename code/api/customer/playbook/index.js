@@ -20,7 +20,7 @@ exports.handler = function (event, context, callback) {
     "Content-Type": "text/plain",
     "Access-Control-Allow-Origin": "*",
   };
-  response(200, { A: "B" }, headers, callback);
+  response(200, event, headers, callback);
   const body = JSON.parse(event.body);
   const params = {
     TableName: "Restaurants",
