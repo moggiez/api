@@ -3,10 +3,16 @@ resource "aws_dynamodb_table" "playbooks" {
   billing_mode   = "PROVISIONED"
   read_capacity  = 5
   write_capacity = 5
-  hash_key       = "customerId"
+  hash_key       = "CustomerId"
+  range_key      = "PlaybookId"
 
   attribute {
-    name = "customerId"
+    name = "CustomerId"
+    type = "S"
+  }
+
+  attribute {
+    name = "PlaybookId"
     type = "S"
   }
 }

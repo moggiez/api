@@ -13,11 +13,18 @@ const headers = {
 const tableName = "playbooks";
 
 exports.get = (customerId, playbookId, response) => {
+  let keyQuery = "CustomerId = :cid";
+  let attributeValues = {
+    ":cid": { S: customerId },
+  };
+  if (playbookId) {
+    keyQuery += " PlaybookId = :pid";
+    attributeValues["pid"] = { S: playbookId };
+  }
+
   const params = {
-    ExpressionAttributeValues: {
-      ":customerId": { S: customerId },
-    },
-    KeyConditionExpression: "customerId = :customerId",
+    KeyConditionExpression: keyQuery,
+    ExpressionAttributeValues: attributeValues,
     TableName: tableName,
   };
   dynamoDB.query(params, (err, data) => {

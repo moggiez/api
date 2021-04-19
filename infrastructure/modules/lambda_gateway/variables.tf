@@ -14,7 +14,6 @@ variable "resource_path_part" {
   type = string
 }
 
-variable "http_method" {
-  type    = string
-  default = "GET"
+variable "http_methods" {
+  type    = set(string)
 }

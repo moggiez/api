@@ -26,3 +26,7 @@ variable "dist_dir" {
   type    = string
   default = "../../dist"
 }
+
+variable "http_methods" {
+  type = set(string)
+}

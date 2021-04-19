@@ -20,7 +20,7 @@ module "gateway_to_lambda" {
   name               = "${var.name}_API"
   api                = var.api
   lambda             = module.lambda_for_api.lambda
-  http_method        = "GET"
+  http_methods       = var.http_methods
   resource_path_part = var.path_part
 }
 
