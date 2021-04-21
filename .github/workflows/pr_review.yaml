@@ -1,4 +1,4 @@
-name: "Deployment"
+name: "Pull Request"
 
 on:
   pull_request:
@@ -46,7 +46,7 @@ jobs:
         with:
           node-version: "14"
 
-      - run: npm install
+      - run: cd code/api/customer/playbook && npm install
 
       # Build the lambda packages
       - name: Build lambda packages
