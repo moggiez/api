@@ -1,4 +1,4 @@
-variable "api_name" {
+variable "api_subdomain" {
   type = string
 }
 

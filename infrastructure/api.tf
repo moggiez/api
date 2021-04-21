@@ -4,8 +4,8 @@ locals {
 }
 
 resource "aws_api_gateway_rest_api" "_" {
-  name        = "PlaybookAPI"
-  description = "Playbook API Gateway"
+  name        = "MoggiezAPI"
+  description = "Moggiez Data API for managing playbooks and customer data"
 }
 
 
@@ -62,7 +62,7 @@ module "playbook_api_subdomain_mapping" {
   api            = aws_api_gateway_rest_api._
   api_stage_name = local.stage
   domain_name    = "moggies.io"
-  api_name       = "playbook"
+  api_subdomain       = "api"
 }
 
 # END DOMAIN FOR THE API

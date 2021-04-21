@@ -1,3 +1,3 @@
 output "api_url" {
-  value = "${var.api_name}-api.${var.domain_name}"
+  value = "${var.api_subdomain}.${var.domain_name}"
 }

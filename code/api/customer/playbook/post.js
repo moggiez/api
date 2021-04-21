@@ -27,8 +27,8 @@ exports.post = (customerId, playbookId, playbook, response) => {
       response(500, err, headers);
     } else {
       const responseBody = {
-        result: "Playbook created.",
-        playbookId: playbookId,
+        Result: "Playbook created.",
+        PlaybookId: playbookId,
       };
       response(201, responseBody, headers);
     }

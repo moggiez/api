@@ -13,7 +13,7 @@ provider "aws" {
 
 resource "aws_api_gateway_domain_name" "_" {
   certificate_arn = aws_acm_certificate_validation._.certificate_arn
-  domain_name     = "${var.api_name}-api.${var.domain_name}"
+  domain_name     = "${var.api_subdomain}.${var.domain_name}"
   security_policy = "TLS_1_2"
 }
 
