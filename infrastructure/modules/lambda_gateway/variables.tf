@@ -15,5 +15,5 @@ variable "resource_path_part" {
 }
 
 variable "http_methods" {
-  type    = set(string)
+  type = set(string)
 }

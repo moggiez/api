@@ -48,7 +48,7 @@ resource "aws_api_gateway_stage" "paybook_api_stage" {
   deployment_id = aws_api_gateway_deployment.playbook_api_deployment.id
   rest_api_id   = aws_api_gateway_rest_api._.id
   stage_name    = local.stage
-  description = "Deployed at ${timestamp()}"
+  description   = "Deployed at ${timestamp()}"
 
   lifecycle {
     create_before_destroy = true
@@ -62,7 +62,7 @@ module "playbook_api_subdomain_mapping" {
   api            = aws_api_gateway_rest_api._
   api_stage_name = local.stage
   domain_name    = "moggies.io"
-  api_subdomain       = "api"
+  api_subdomain  = "api"
 }
 
 # END DOMAIN FOR THE API
