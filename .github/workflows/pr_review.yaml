@@ -41,6 +41,13 @@ jobs:
       - name: Lint (terraform code only)
         run: cd infrastructure && terraform fmt -check
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+
+      - run: npm install
+
       # Build the lambda packages
       - name: Build lambda packages
         run: make build
