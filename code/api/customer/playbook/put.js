@@ -2,6 +2,7 @@
 
 const AWS = require("aws-sdk");
 const docClient = new AWS.DynamoDB.DocumentClient();
+const mapper = require("./mapper");
 
 const headers = {
   "Content-Type": "application/json",
@@ -9,25 +10,29 @@ const headers = {
 };
 const tableName = "playbooks";
 
-exports.post = (customerId, playbookId, playbook, response) => {
+exports.put = (customerId, playbookId, playbook, response) => {
   var params = {
     TableName: tableName,
-    Item: {
+    Key: {
       CustomerId: customerId,
       PlaybookId: playbookId,
-      Playbook: playbook,
     },
+    UpdateExpression: "set Playbook = :pb",
+    ExpressionAttributeValues: {
+      ":pb": playbook,
+    },
+    ReturnValues: "UPDATED_NEW",
   };
 
-  docClient.put(params, (err, data) => {
+  docClient.update(params, (err, data) => {
     if (err) {
       response(500, err, headers);
     } else {
       const responseBody = {
-        Result: "Playbook created.",
-        PlaybookId: playbookId,
+        Result: "Playbook updated.",
+        Playbook: JSON.parse(data.Attributes.Playbook),
       };
-      response(201, responseBody, headers);
+      response(200, responseBody, headers);
     }
   });
 };

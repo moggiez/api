@@ -2,6 +2,7 @@
 
 const get_handler = require("./get");
 const post_handler = require("./post");
+const put_handler = require("./put");
 const uuid = require("uuid");
 
 const headers = {
@@ -38,6 +39,11 @@ exports.handler = function (event, context, callback) {
       const playbookId = uuid.v4();
       const playbook = event.body;
       post_handler.post(customerId, playbookId, playbook, response);
+    } else if (httpMethod == "PUT" && pathParams.length > 1) {
+      const customerId = pathParams[0];
+      const playbookId = pathParams[1];
+      const playbook = event.body;
+      put_handler.put(customerId, playbookId, playbook, response);
     } else {
       response(403, "Not supported.", headers);
     }

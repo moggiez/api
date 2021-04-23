@@ -1,6 +1,7 @@
 locals {
-  stage        = "v1"
-  http_methods = toset(["GET", "POST"])
+  stages = toset(["blue", "green"])
+  stage = "green"
+  http_methods = toset(["GET", "POST", "PUT", "DELETE"])
 }
 
 resource "aws_api_gateway_rest_api" "_" {
@@ -31,13 +32,12 @@ module "playbook_lambda_api_proxy" {
 
 # Deployment of the API Gateway
 resource "aws_api_gateway_deployment" "playbook_api_deployment" {
+  for_each = local.stages
+
   depends_on = [module.playbook_lambda_api]
 
   rest_api_id = aws_api_gateway_rest_api._.id
-  description = "Deployed at ${timestamp()}"
-
-  # stage_name  = local.stage
-  # stage_description = "Deployed at ${timestamp()}"
+  description = each.value
 
   lifecycle {
     create_before_destroy = true
@@ -45,10 +45,11 @@ resource "aws_api_gateway_deployment" "playbook_api_deployment" {
 }
 
 resource "aws_api_gateway_stage" "paybook_api_stage" {
-  deployment_id = aws_api_gateway_deployment.playbook_api_deployment.id
+  for_each = aws_api_gateway_deployment.playbook_api_deployment
+
+  deployment_id = each.value.id
   rest_api_id   = aws_api_gateway_rest_api._.id
-  stage_name    = local.stage
-  description   = "Deployed at ${timestamp()}"
+  stage_name    = each.value.description
 
   lifecycle {
     create_before_destroy = true
