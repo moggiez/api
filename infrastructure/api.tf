@@ -1,6 +1,6 @@
 locals {
-  stages = toset(["blue", "green"])
-  stage = "green"
+  stages       = toset(["blue", "green"])
+  stage        = "green"
   http_methods = toset(["GET", "POST", "PUT", "DELETE"])
 }
 
