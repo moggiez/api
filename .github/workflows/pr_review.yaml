@@ -46,7 +46,8 @@ jobs:
         with:
           node-version: "14"
 
-      - run: cd code/api/customer/playbook && npm install
+      - run: cd code/playbook && npm install
+      - run: cd code/loadtest && npm install
 
       # Build the lambda packages
       - name: Build lambda packages
