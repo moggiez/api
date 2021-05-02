@@ -5,40 +5,35 @@ const dynamoDB = new AWS.DynamoDB({
   region: "eu-west-1",
   apiVersion: "2012-08-10",
 });
+const config = require("./config");
 const mapper = require("./mapper");
 
-const headers = {
-  "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "*",
-};
-const tableName = "playbooks";
-
-exports.get = (customerId, playbookId, response) => {
+exports.get = (customerId, loadtestId, response) => {
   let keyQuery = "CustomerId = :cid";
   let attributeValues = {
     ":cid": { S: customerId },
   };
-  if (playbookId) {
-    keyQuery += " AND PlaybookId = :pid";
-    attributeValues[":pid"] = { S: playbookId };
+  if (loadtestId) {
+    keyQuery += " AND LoadtestId = :ltid";
+    attributeValues[":ltid"] = { S: loadtestId };
   }
 
   const params = {
     KeyConditionExpression: keyQuery,
     ExpressionAttributeValues: attributeValues,
-    TableName: tableName,
+    TableName: config.tableName,
   };
   dynamoDB.query(params, (err, data) => {
     if (err) {
-      response(500, err, headers);
+      response(500, err, config.headers);
     } else {
-      if (playbookId && data.Items.length == 1) {
-        response(200, mapper.map(data.Items[0]), headers);
+      if (loadtestId && data.Items.length == 1) {
+        response(200, mapper.map(data.Items[0]), config.headers);
       } else {
         const responseBody = {
           data: data.Items.map(mapper.map),
         };
-        response(200, responseBody, headers);
+        response(200, responseBody, config.headers);
       }
     }
   });

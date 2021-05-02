@@ -2,16 +2,11 @@
 
 const AWS = require("aws-sdk");
 const docClient = new AWS.DynamoDB.DocumentClient();
-
-const headers = {
-  "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "*",
-};
-const tableName = "playbooks";
+const config = require("./config");
 
 exports.post = (customerId, playbookId, playbook, response) => {
   var params = {
-    TableName: tableName,
+    TableName: config.tableName,
     Item: {
       CustomerId: customerId,
       PlaybookId: playbookId,
@@ -21,13 +16,13 @@ exports.post = (customerId, playbookId, playbook, response) => {
 
   docClient.put(params, (err, data) => {
     if (err) {
-      response(500, err, headers);
+      response(500, err, config.headers);
     } else {
       const responseBody = {
         Result: "Playbook created.",
         PlaybookId: playbookId,
       };
-      response(201, responseBody, headers);
+      response(201, responseBody, config.headers);
     }
   });
 };

@@ -12,14 +12,15 @@ resource "aws_api_gateway_rest_api" "_" {
 
 # PLAYBOOK API
 module "playbook_lambda_api" {
-  source       = "./modules/lambda_api"
-  name         = "Playbook"
-  api          = aws_api_gateway_rest_api._
-  path_part    = "playbook"
-  bucket       = aws_s3_bucket.api_bucket
-  http_methods = local.http_methods
-  dist_version = var.dist_version
-  dist_dir     = "../dist"
+  source         = "./modules/lambda_api"
+  name           = "playbook"
+  api            = aws_api_gateway_rest_api._
+  dynamodb_table = "playbooks"
+  path_part      = "playbook"
+  bucket         = aws_s3_bucket.api_bucket
+  http_methods   = local.http_methods
+  dist_version   = var.dist_version
+  dist_dir       = "../dist"
 }
 
 module "playbook_lambda_api_proxy" {
@@ -29,12 +30,36 @@ module "playbook_lambda_api_proxy" {
   parent_api_resource = module.playbook_lambda_api.api_resource
   lambda              = module.playbook_lambda_api.lambda
 }
+# END PLAYBOOK API
+
+# LOADTEST API
+module "loadtest_lambda_api" {
+  source         = "./modules/lambda_api"
+  name           = "loadtest"
+  api            = aws_api_gateway_rest_api._
+  dynamodb_table = "loadtests"
+  path_part      = "loadtest"
+  bucket         = aws_s3_bucket.api_bucket
+  http_methods   = local.http_methods
+  dist_version   = var.dist_version
+  dist_dir       = "../dist"
+}
+
+module "loadtest_lambda_api_proxy" {
+  source              = "./modules/api_resource_proxy"
+  api                 = aws_api_gateway_rest_api._
+  http_methods        = local.http_methods
+  parent_api_resource = module.loadtest_lambda_api.api_resource
+  lambda              = module.loadtest_lambda_api.lambda
+}
+
+# END LOADTEST API
 
 # Deployment of the API Gateway
-resource "aws_api_gateway_deployment" "playbook_api_deployment" {
+resource "aws_api_gateway_deployment" "api_deployment" {
   for_each = local.stages
 
-  depends_on = [module.playbook_lambda_api]
+  depends_on = [module.playbook_lambda_api, module.loadtest_lambda_api]
 
   rest_api_id = aws_api_gateway_rest_api._.id
   description = each.value
@@ -44,8 +69,8 @@ resource "aws_api_gateway_deployment" "playbook_api_deployment" {
   }
 }
 
-resource "aws_api_gateway_stage" "paybook_api_stage" {
-  for_each = aws_api_gateway_deployment.playbook_api_deployment
+resource "aws_api_gateway_stage" "api_stage" {
+  for_each = aws_api_gateway_deployment.api_deployment
 
   deployment_id = each.value.id
   rest_api_id   = aws_api_gateway_rest_api._.id
@@ -55,7 +80,6 @@ resource "aws_api_gateway_stage" "paybook_api_stage" {
     create_before_destroy = true
   }
 }
-# END PLAYBOOK API
 
 # DOMAIN FOR THE API
 module "playbook_api_subdomain_mapping" {

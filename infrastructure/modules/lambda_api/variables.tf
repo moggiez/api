@@ -30,3 +30,7 @@ variable "dist_dir" {
 variable "http_methods" {
   type = set(string)
 }
+
+variable "dynamodb_table" {
+  type = string
+}

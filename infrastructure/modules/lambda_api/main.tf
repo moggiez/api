@@ -2,7 +2,7 @@ resource "aws_iam_policy" "dynamodb_access_policy" {
   name = "${var.name}_api_lambda_access_dynamodb_policy"
   path = "/"
 
-  policy = templatefile("templates/dynamo_access_policy.json", { table = "playbooks" })
+  policy = templatefile("templates/dynamo_access_policy.json", { table = var.dynamodb_table })
 }
 
 module "lambda_for_api" {
@@ -10,8 +10,8 @@ module "lambda_for_api" {
   s3_bucket      = var.bucket
   dist_dir       = var.dist_dir
   dist_version   = var.dist_version
-  name           = "playbook_api"
-  dynamodb_table = "playbooks"
+  name           = "${var.name}_api"
+  dynamodb_table = var.dynamodb_table
   policies       = [aws_iam_policy.dynamodb_access_policy.arn]
 }
 

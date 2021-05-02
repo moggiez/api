@@ -4,18 +4,9 @@ const get_handler = require("./get");
 const post_handler = require("./post");
 const put_handler = require("./put");
 const uuid = require("uuid");
-
-const headers = {
-  "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "*",
-};
-const DEBUG = false;
+const config = require("./config");
 
 exports.handler = function (event, context, callback) {
-  const httpMethod = event.httpMethod;
-  const pathParameters = event.pathParameters;
-  const pathParams = pathParameters.proxy.split("/");
-
   const response = (status, body, headers) => {
     const httpResponse = {
       statusCode: status,
@@ -25,9 +16,16 @@ exports.handler = function (event, context, callback) {
     callback(null, httpResponse);
   };
 
-  if (DEBUG) {
-    response(200, event, headers);
+  if (config.DEBUG) {
+    response(200, event, config.headers);
   }
+
+  const httpMethod = event.httpMethod;
+  const pathParameters = event.pathParameters;
+  const pathParams =
+    pathParameters != null && "proxy" in pathParameters && pathParameters.proxy
+      ? pathParameters.proxy.split("/")
+      : [];
 
   try {
     if (httpMethod == "GET") {
@@ -45,9 +43,9 @@ exports.handler = function (event, context, callback) {
       const playbook = event.body;
       put_handler.put(customerId, playbookId, playbook, response);
     } else {
-      response(403, "Not supported.", headers);
+      response(403, "Not supported.", config.headers);
     }
   } catch (err) {
-    response(500, err, headers);
+    response(500, err, config.headers);
   }
 };

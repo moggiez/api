@@ -3,16 +3,11 @@
 const AWS = require("aws-sdk");
 const docClient = new AWS.DynamoDB.DocumentClient();
 const mapper = require("./mapper");
-
-const headers = {
-  "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "*",
-};
-const tableName = "playbooks";
+const config = require("./config");
 
 exports.put = (customerId, playbookId, playbook, response) => {
   var params = {
-    TableName: tableName,
+    TableName: config.tableName,
     Key: {
       CustomerId: customerId,
       PlaybookId: playbookId,
@@ -26,13 +21,13 @@ exports.put = (customerId, playbookId, playbook, response) => {
 
   docClient.update(params, (err, data) => {
     if (err) {
-      response(500, err, headers);
+      response(500, err, config.headers);
     } else {
       const responseBody = {
         Result: "Playbook updated.",
         Playbook: JSON.parse(data.Attributes.Playbook),
       };
-      response(200, responseBody, headers);
+      response(200, responseBody, config.headers);
     }
   });
 };

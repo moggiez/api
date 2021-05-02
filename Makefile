@@ -7,9 +7,12 @@ build-cleanup:
 	rm -rf ./dist/* & mkdir -p dist
 
 build-playbook-api:
-	cd code/api/customer/playbook/ && zip -r ../../../../dist/playbook_api.$(VERSION).zip ./
+	cd code/playbook/ && zip -r ../../dist/playbook_api.$(VERSION).zip ./
 
-build: build-cleanup build-playbook-api
+build-loadtest-api:
+	cd code/loadtest/ && zip -r ../../dist/loadtest_api.$(VERSION).zip ./
+
+build: build-cleanup build-playbook-api build-loadtest-api
 
 infra-init:
 	cd infrastructure && terraform init -force-copy -backend-config="bucket=moggiez-api-terraform-state-backend" -backend-config="dynamodb_table=moggiez-api-terraform_state" -backend-config="key=terraform.state" -backend-config="region=eu-west-1"
