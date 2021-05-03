@@ -6,10 +6,10 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "moggiez-api-terraform-state-backend"
-    key            = "terraform.state"
+    bucket         = "moggies.io-terraform-state-backend"
+    key            = "api-terraform.state"
     region         = "eu-west-1"
-    dynamodb_table = "moggiez-api-terraform_state"
+    dynamodb_table = "moggies.io-api-terraform_state"
   }
 }
 
