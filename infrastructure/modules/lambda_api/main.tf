@@ -22,6 +22,7 @@ module "gateway_to_lambda" {
   lambda             = module.lambda_for_api.lambda
   http_methods       = var.http_methods
   resource_path_part = var.path_part
+  authorizer         = var.authorizer
 }
 
 module "gateway_cors" {

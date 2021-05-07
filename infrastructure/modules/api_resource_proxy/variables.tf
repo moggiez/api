@@ -11,3 +11,7 @@ variable "lambda" {
 variable "http_methods" {
   type = set(string)
 }
+
+variable "authorizer" {
+  default = null
+}

@@ -1,6 +1,6 @@
 locals {
   stages       = toset(["blue", "green"])
-  stage        = "green"
+  stage        = "blue"
   http_methods = toset(["GET", "POST", "PUT", "DELETE"])
 }
 
@@ -9,6 +9,12 @@ resource "aws_api_gateway_rest_api" "_" {
   description = "Moggiez Data API for managing playbooks and customer data"
 }
 
+resource "aws_api_gateway_authorizer" "_" {
+  name          = "MoggiesUserAuthorizer"
+  rest_api_id   = aws_api_gateway_rest_api._.id
+  type          = "COGNITO_USER_POOLS"
+  provider_arns = ["arn:aws:cognito-idp:${var.region}:${var.account}:userpool/${var.user_pool_id}"]
+}
 
 # PLAYBOOK API
 module "playbook_lambda_api" {
@@ -21,6 +27,7 @@ module "playbook_lambda_api" {
   http_methods   = local.http_methods
   dist_version   = var.dist_version
   dist_dir       = "../dist"
+  authorizer     = aws_api_gateway_authorizer._
 }
 
 module "playbook_lambda_api_proxy" {
@@ -29,6 +36,7 @@ module "playbook_lambda_api_proxy" {
   http_methods        = local.http_methods
   parent_api_resource = module.playbook_lambda_api.api_resource
   lambda              = module.playbook_lambda_api.lambda
+  authorizer          = aws_api_gateway_authorizer._
 }
 # END PLAYBOOK API
 

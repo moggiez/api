@@ -22,3 +22,8 @@ variable "application" {
   type    = string
   default = "Moggiez"
 }
+
+variable "user_pool_id" {
+  type    = string
+  default = "eu-west-1_NwekjaAN1"
+}
