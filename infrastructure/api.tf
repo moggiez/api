@@ -1,6 +1,6 @@
 locals {
   stages       = toset(["blue", "green"])
-  stage        = "blue"
+  stage        = "green"
   http_methods = toset(["GET", "POST", "PUT", "DELETE"])
 }
 
@@ -51,6 +51,7 @@ module "loadtest_lambda_api" {
   http_methods   = local.http_methods
   dist_version   = var.dist_version
   dist_dir       = "../dist"
+  authorizer     = aws_api_gateway_authorizer._
 }
 
 module "loadtest_lambda_api_proxy" {
@@ -59,6 +60,7 @@ module "loadtest_lambda_api_proxy" {
   http_methods        = local.http_methods
   parent_api_resource = module.loadtest_lambda_api.api_resource
   lambda              = module.loadtest_lambda_api.lambda
+  authorizer     = aws_api_gateway_authorizer._
 }
 
 # END LOADTEST API
