@@ -12,7 +12,13 @@ build-playbook-api:
 build-loadtest-api:
 	cd code/loadtest/ && zip -r ../../dist/loadtest_api.$(VERSION).zip ./
 
-build: build-cleanup build-playbook-api build-loadtest-api
+build-organisation-api:
+	cd code/organisation/ && zip -r ../../dist/organisation_api.$(VERSION).zip ./
+
+build-domain-api:
+	cd code/domain/ && zip -r ../../dist/domain_api.$(VERSION).zip ./
+
+build: build-cleanup build-playbook-api build-loadtest-api build-organisation-api build-domain-api
 
 infra-init:
 	cd infrastructure && terraform init -force-copy -backend-config="bucket=moggies.io-terraform-state-backend" -backend-config="dynamodb_table=moggies.io-api-terraform_state" -backend-config="key=api-terraform.state" -backend-config="region=eu-west-1"

@@ -60,10 +60,60 @@ module "loadtest_lambda_api_proxy" {
   http_methods        = local.http_methods
   parent_api_resource = module.loadtest_lambda_api.api_resource
   lambda              = module.loadtest_lambda_api.lambda
-  authorizer     = aws_api_gateway_authorizer._
+  authorizer          = aws_api_gateway_authorizer._
 }
 
 # END LOADTEST API
+
+# ORGANISATION API
+module "organisation_lambda_api" {
+  source         = "./modules/lambda_api"
+  name           = "organisation"
+  api            = aws_api_gateway_rest_api._
+  dynamodb_table = "organisations"
+  path_part      = "organisation"
+  bucket         = aws_s3_bucket.api_bucket
+  http_methods   = local.http_methods
+  dist_version   = var.dist_version
+  dist_dir       = "../dist"
+  // authorizer     = aws_api_gateway_authorizer._
+}
+
+module "organisation_lambda_api_proxy" {
+  source              = "./modules/api_resource_proxy"
+  api                 = aws_api_gateway_rest_api._
+  http_methods        = local.http_methods
+  parent_api_resource = module.organisation_lambda_api.api_resource
+  lambda              = module.organisation_lambda_api.lambda
+  // authorizer     = aws_api_gateway_authorizer._
+}
+
+# END ORGANISATION API
+
+# DOMAIN API
+module "domain_lambda_api" {
+  source         = "./modules/lambda_api"
+  name           = "domain"
+  api            = aws_api_gateway_rest_api._
+  dynamodb_table = "domains"
+  path_part      = "domain"
+  bucket         = aws_s3_bucket.api_bucket
+  http_methods   = local.http_methods
+  dist_version   = var.dist_version
+  dist_dir       = "../dist"
+  // authorizer     = aws_api_gateway_authorizer._
+}
+
+module "domain_lambda_api_proxy" {
+  source              = "./modules/api_resource_proxy"
+  api                 = aws_api_gateway_rest_api._
+  http_methods        = local.http_methods
+  parent_api_resource = module.domain_lambda_api.api_resource
+  lambda              = module.domain_lambda_api.lambda
+  // authorizer     = aws_api_gateway_authorizer._
+}
+
+# END DOMAIN API
 
 # Deployment of the API Gateway
 resource "aws_api_gateway_deployment" "api_deployment" {
@@ -74,8 +124,13 @@ resource "aws_api_gateway_deployment" "api_deployment" {
   rest_api_id = aws_api_gateway_rest_api._.id
   description = each.value
 
+
   lifecycle {
     create_before_destroy = true
+  }
+
+  triggers = {
+    redeployment = sha1("${timestamp()}")
   }
 }
 
