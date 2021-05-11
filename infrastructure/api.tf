@@ -1,6 +1,6 @@
 locals {
   stages       = toset(["blue", "green"])
-  stage        = "green"
+  stage        = "blue"
   http_methods = toset(["GET", "POST", "PUT", "DELETE"])
 }
 
@@ -76,7 +76,7 @@ module "organisation_lambda_api" {
   http_methods   = local.http_methods
   dist_version   = var.dist_version
   dist_dir       = "../dist"
-  // authorizer     = aws_api_gateway_authorizer._
+  authorizer     = aws_api_gateway_authorizer._
 }
 
 module "organisation_lambda_api_proxy" {
@@ -85,7 +85,7 @@ module "organisation_lambda_api_proxy" {
   http_methods        = local.http_methods
   parent_api_resource = module.organisation_lambda_api.api_resource
   lambda              = module.organisation_lambda_api.lambda
-  // authorizer     = aws_api_gateway_authorizer._
+  authorizer     = aws_api_gateway_authorizer._
 }
 
 # END ORGANISATION API
@@ -101,7 +101,7 @@ module "domain_lambda_api" {
   http_methods   = local.http_methods
   dist_version   = var.dist_version
   dist_dir       = "../dist"
-  // authorizer     = aws_api_gateway_authorizer._
+  authorizer     = aws_api_gateway_authorizer._
 }
 
 module "domain_lambda_api_proxy" {
@@ -110,7 +110,7 @@ module "domain_lambda_api_proxy" {
   http_methods        = local.http_methods
   parent_api_resource = module.domain_lambda_api.api_resource
   lambda              = module.domain_lambda_api.lambda
-  // authorizer     = aws_api_gateway_authorizer._
+  authorizer     = aws_api_gateway_authorizer._
 }
 
 # END DOMAIN API
