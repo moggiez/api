@@ -5,7 +5,7 @@ const docClient = new AWS.DynamoDB.DocumentClient();
 const config = require("./config");
 
 exports.post = (customerId, playbookId, playbook, response) => {
-  var params = {
+  const params = {
     TableName: config.tableName,
     Item: {
       CustomerId: customerId,

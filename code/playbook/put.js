@@ -2,11 +2,10 @@
 
 const AWS = require("aws-sdk");
 const docClient = new AWS.DynamoDB.DocumentClient();
-const mapper = require("./mapper");
 const config = require("./config");
 
 exports.put = (customerId, playbookId, playbook, response) => {
-  var params = {
+  const params = {
     TableName: config.tableName,
     Key: {
       CustomerId: customerId,
