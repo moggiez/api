@@ -71,6 +71,7 @@ class Table {
         params.Item = recordAttributesObject;
         params.Item[this.hashKey] = hashKeyValue;
         params.Item[this.sortKey] = sortKeyValue;
+        params.ReturnValues = "ALL_OLD";
         docClient.put(params, (err, data) => {
           if (err) {
             reject(err);
@@ -97,7 +98,7 @@ class Table {
           const fieldNewValue = element[1];
           const valuePlaceholder = `:f${index}`;
           params.UpdateExpression += `${fieldName} = ${valuePlaceholder}${
-            index < array.length ? "," : ""
+            index + 1 < array.length ? "," : ""
           }`;
           params.ExpressionAttributeValues[valuePlaceholder] = fieldNewValue;
         });

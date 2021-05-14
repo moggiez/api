@@ -37,6 +37,13 @@ exports.post = (organisationId, domainName, payload, response) => {
     .catch((err) => response(500, err, config.headers));
 };
 
+exports.put = (organisationId, domainName, payload, response) => {
+  table
+    .update(organisationId, domainName, payload)
+    .then((data) => response(200, data, config.headers))
+    .catch((err) => response(500, err, config.headers));
+};
+
 exports.delete = (organisationId, domainName, response) => {
   table
     .delete(organisationId, domainName)
