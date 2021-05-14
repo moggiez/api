@@ -14,7 +14,10 @@
         "dynamodb:UpdateItem",
         "dynamodb:DeleteItem"
       ],
-      "Resource": "arn:aws:dynamodb:*:*:table/${table}"
+      "Resource": [
+        "arn:aws:dynamodb:*:*:table/${table}",
+        "arn:aws:dynamodb:*:*:table/${table}/index/*"
+      ]
     },
     {
       "Sid": "GetStreamRecords",

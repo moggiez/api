@@ -18,7 +18,10 @@ build-organisation-api:
 build-domain-api:
 	cd code/domain/ && zip -r ../../dist/domain_api.$(VERSION).zip ./
 
-build: build-cleanup build-playbook-api build-loadtest-api build-organisation-api build-domain-api
+build-user-api:
+	cd code/user/ && zip -r ../../dist/user_api.$(VERSION).zip ./
+
+build: build-cleanup build-playbook-api build-loadtest-api build-organisation-api build-domain-api build-user-api
 
 infra-init:
 	cd infrastructure && terraform init -force-copy -backend-config="bucket=moggies.io-terraform-state-backend" -backend-config="dynamodb_table=moggies.io-api-terraform_state" -backend-config="key=api-terraform.state" -backend-config="region=eu-west-1"

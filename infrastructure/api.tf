@@ -1,6 +1,6 @@
 locals {
   stages       = toset(["blue", "green"])
-  stage        = "blue"
+  stage        = "green"
   http_methods = toset(["GET", "POST", "PUT", "DELETE"])
 }
 
@@ -114,6 +114,31 @@ module "domain_lambda_api_proxy" {
 }
 
 # END DOMAIN API
+
+# USER API
+module "user_lambda_api" {
+  source         = "./modules/lambda_api"
+  name           = "user"
+  api            = aws_api_gateway_rest_api._
+  dynamodb_table = "organisations"
+  path_part      = "user"
+  bucket         = aws_s3_bucket.api_bucket
+  http_methods   = local.http_methods
+  dist_version   = var.dist_version
+  dist_dir       = "../dist"
+  authorizer     = aws_api_gateway_authorizer._
+}
+
+module "user_lambda_api_proxy" {
+  source              = "./modules/api_resource_proxy"
+  api                 = aws_api_gateway_rest_api._
+  http_methods        = local.http_methods
+  parent_api_resource = module.user_lambda_api.api_resource
+  lambda              = module.user_lambda_api.lambda
+  authorizer          = aws_api_gateway_authorizer._
+}
+
+# END USER API
 
 # Deployment of the API Gateway
 resource "aws_api_gateway_deployment" "api_deployment" {
