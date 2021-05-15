@@ -21,7 +21,18 @@ build-domain-api:
 build-user-api:
 	cd code/user/ && zip -r ../../dist/user_api.$(VERSION).zip ./
 
-build: build-cleanup build-playbook-api build-loadtest-api build-organisation-api build-domain-api build-user-api
+build-layer-db:
+	cd code/libs/db && zip -rv ../../../dist/db_layer.zip ./
+
+build-layer-auth:
+	cd code/libs/auth && zip -rv ../../../dist/auth_layer.zip ./
+
+build-layer-lambda_helpers:
+	cd code/libs/lambda_helpers && zip -rv ../../../dist/lambda_helpers_layer.zip ./
+
+build-layers: build-layer-db build-layer-auth build-layer-lambda_helpers
+
+build: build-cleanup build-layers build-playbook-api build-loadtest-api build-organisation-api build-domain-api build-user-api
 
 infra-init:
 	cd infrastructure && terraform init -force-copy -backend-config="bucket=moggies.io-terraform-state-backend" -backend-config="dynamodb_table=moggies.io-api-terraform_state" -backend-config="key=api-terraform.state" -backend-config="region=eu-west-1"

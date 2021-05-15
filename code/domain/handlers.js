@@ -1,7 +1,7 @@
 "use strict";
 
 const config = require("./config");
-const db = require("./db");
+const db = require("db");
 const mapper = require("./mapper");
 const table = new db.Table({
   tableName: config.tableName,

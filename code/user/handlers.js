@@ -1,17 +1,22 @@
 "use strict";
 
 const config = require("./config");
-const db = require("./db");
+const db = require("db");
 const mapper = require("./mapper");
 const orgTable = new db.Table({
   tableName: config.tableName,
   hashKey: "OrganisationId",
   sortKey: "UserId",
-  mapper: mapper,
+  indexes: {
+    UserOrganisations: {
+      hashKey: "UserId",
+      sortKey: "OrganisationId",
+    },
+  },
 });
 
 exports.getOrg = (userId, response) => {
-  const promise = orgTable.querySecondaryIndex("UserOrganisations", userId);
+  const promise = orgTable.getBySecondaryIndex("UserOrganisations", userId);
 
   promise
     .then((data) => {

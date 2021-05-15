@@ -38,3 +38,7 @@ variable "dynamodb_table" {
 variable "authorizer" {
   default = null
 }
+
+variable "layers" {
+  default = null
+}

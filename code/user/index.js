@@ -1,8 +1,8 @@
 "use strict";
 
 const config = require("./config");
-const helpers = require("./helpers");
-const auth = require("./auth");
+const helpers = require("lambda_helpers");
+const auth = require("cognitoAuth");
 const handlers = require("./handlers");
 
 exports.handler = function (event, context, callback) {

@@ -13,6 +13,7 @@ module "lambda_for_api" {
   name           = "${var.name}_api"
   dynamodb_table = var.dynamodb_table
   policies       = [aws_iam_policy.dynamodb_access_policy.arn]
+  layers         = var.layers
 }
 
 module "gateway_to_lambda" {

@@ -130,3 +130,4 @@ dmypy.json
 infrastructure/.terraform/
 infrastructure/terraform-backend/.terraform
 **/node_modules/
+.DS_Store

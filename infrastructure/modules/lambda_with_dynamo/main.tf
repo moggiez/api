@@ -15,6 +15,8 @@ resource "aws_lambda_function" "_" {
   runtime          = "nodejs14.x"
   source_code_hash = filebase64sha256("${var.dist_dir}/${var.name}.${var.dist_version}.zip")
 
+  layers = var.layers != null ? var.layers : []
+
   role = aws_iam_role._.arn
 }
 

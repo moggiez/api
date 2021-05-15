@@ -1,13 +1,18 @@
 "use strict";
 
 const config = require("./config");
-const db = require("./db");
+const db = require("db");
 const mapper = require("./mapper");
 const table = new db.Table({
   tableName: config.tableName,
   hashKey: "OrganisationId",
   sortKey: "UserId",
-  mapper: mapper,
+  indexes: {
+    UserOrganisations: {
+      hashKey: "UserId",
+      sortKey: "OrganisationId",
+    },
+  },
 });
 
 exports.get = (organisationId, userId, response) => {

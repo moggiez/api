@@ -20,5 +20,8 @@ variable "dynamodb_table" {
 
 variable "policies" {
   type = list(string)
+}
 
+variable "layers" {
+  default = null
 }

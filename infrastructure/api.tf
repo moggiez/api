@@ -27,6 +27,11 @@ module "playbook_lambda_api" {
   http_methods   = local.http_methods
   dist_version   = var.dist_version
   dist_dir       = "../dist"
+  layers = [
+    aws_lambda_layer_version.db.arn,
+    aws_lambda_layer_version.auth.arn,
+    aws_lambda_layer_version.lambda_helpers.arn
+  ]
   authorizer     = aws_api_gateway_authorizer._
 }
 
@@ -51,6 +56,11 @@ module "loadtest_lambda_api" {
   http_methods   = local.http_methods
   dist_version   = var.dist_version
   dist_dir       = "../dist"
+  layers = [
+    aws_lambda_layer_version.db.arn,
+    aws_lambda_layer_version.auth.arn,
+    aws_lambda_layer_version.lambda_helpers.arn
+  ]
   authorizer     = aws_api_gateway_authorizer._
 }
 
@@ -76,6 +86,11 @@ module "organisation_lambda_api" {
   http_methods   = local.http_methods
   dist_version   = var.dist_version
   dist_dir       = "../dist"
+  layers = [
+    aws_lambda_layer_version.db.arn,
+    aws_lambda_layer_version.auth.arn,
+    aws_lambda_layer_version.lambda_helpers.arn
+  ]
   authorizer     = aws_api_gateway_authorizer._
 }
 
@@ -101,6 +116,11 @@ module "domain_lambda_api" {
   http_methods   = local.http_methods
   dist_version   = var.dist_version
   dist_dir       = "../dist"
+  layers = [
+    aws_lambda_layer_version.db.arn,
+    aws_lambda_layer_version.auth.arn,
+    aws_lambda_layer_version.lambda_helpers.arn
+  ]
   authorizer     = aws_api_gateway_authorizer._
 }
 
@@ -126,7 +146,12 @@ module "user_lambda_api" {
   http_methods   = local.http_methods
   dist_version   = var.dist_version
   dist_dir       = "../dist"
-  authorizer     = aws_api_gateway_authorizer._
+  layers = [
+    aws_lambda_layer_version.db.arn,
+    aws_lambda_layer_version.auth.arn,
+    aws_lambda_layer_version.lambda_helpers.arn
+  ]
+  authorizer = aws_api_gateway_authorizer._
 }
 
 module "user_lambda_api_proxy" {
