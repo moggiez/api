@@ -4,11 +4,11 @@ const AWS = require("aws-sdk");
 const docClient = new AWS.DynamoDB.DocumentClient();
 const config = require("./config");
 
-exports.post = (customerId, playbookId, playbook, response) => {
+exports.post = (organisationId, playbookId, playbook, response) => {
   const params = {
     TableName: config.tableName,
     Item: {
-      CustomerId: customerId,
+      OrganisationId: organisationId,
       PlaybookId: playbookId,
       Playbook: playbook,
     },

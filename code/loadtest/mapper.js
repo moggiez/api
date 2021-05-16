@@ -1,6 +1,6 @@
 exports.map = (dynamoDbItem) => {
   return {
-    CustomerId: dynamoDbItem.CustomerId.S,
+    OrganisationId: dynamoDbItem.OrganisationId.S,
     LoadtestId: dynamoDbItem.LoadtestId.S,
     PlaybookId: dynamoDbItem.PlaybookId.S,
   };

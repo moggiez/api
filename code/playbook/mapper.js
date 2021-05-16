@@ -1,6 +1,6 @@
 exports.map = (dynamoDbItem) => {
   return {
-    CustomerId: dynamoDbItem.CustomerId.S,
+    OrganisationId: dynamoDbItem.OrganisationId.S,
     PlaybookId: dynamoDbItem.PlaybookId.S,
     Playbook: JSON.parse(dynamoDbItem.Playbook.S),
   };

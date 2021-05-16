@@ -4,11 +4,11 @@ const AWS = require("aws-sdk");
 const docClient = new AWS.DynamoDB.DocumentClient();
 const config = require("./config");
 
-exports.put = (customerId, playbookId, playbook, response) => {
+exports.put = (organisationId, playbookId, playbook, response) => {
   const params = {
     TableName: config.tableName,
     Key: {
-      CustomerId: customerId,
+      OrganisationId: organisationId,
       PlaybookId: playbookId,
     },
     UpdateExpression: "set Playbook = :pb",

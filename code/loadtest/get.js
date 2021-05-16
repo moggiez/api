@@ -8,10 +8,10 @@ const dynamoDB = new AWS.DynamoDB({
 const config = require("./config");
 const mapper = require("./mapper");
 
-exports.get = (customerId, loadtestId, response) => {
-  let keyQuery = "CustomerId = :cid";
+exports.get = (organisationId, loadtestId, response) => {
+  let keyQuery = "OrganisationId = :oid";
   let attributeValues = {
-    ":cid": { S: customerId },
+    ":oid": { S: organisationId },
   };
   if (loadtestId) {
     keyQuery += " AND LoadtestId = :ltid";
