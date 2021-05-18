@@ -1,23 +1,19 @@
 "use strict";
 
 const config = require("./config");
-const get_handler = require("./get");
-const post_handler = require("./post");
+const helpers = require("lambda_helpers");
+const auth = require("cognitoAuth");
 const uuid = require("uuid");
+const handlers = require("./handlers");
 
 exports.handler = function (event, context, callback) {
-  const response = (status, body, headers) => {
-    const httpResponse = {
-      statusCode: status,
-      body: JSON.stringify(body),
-      headers: headers,
-    };
-    callback(null, httpResponse);
-  };
+  const response = helpers.getResponseFn(callback);
 
   if (config.DEBUG) {
     response(200, event, config.headers);
   }
+
+  const user = auth.getUserFromEvent(event);
 
   const httpMethod = event.httpMethod;
   const pathParameters = event.pathParameters;
@@ -27,15 +23,18 @@ exports.handler = function (event, context, callback) {
       : [];
 
   try {
+    const organisationId = pathParams[0];
+    const loadtestId = pathParams.length > 1 ? pathParams[1] : "";
+    const payload = JSON.parse(event.body);
+    if (payload) {
+      payload["UserId"] = user.id;
+    }
+
     if (httpMethod == "GET") {
-      const customerId = pathParams[0];
-      const loadtestId = pathParams.length > 1 ? pathParams[1] : "";
-      get_handler.get(customerId, loadtestId, response);
+      handlers.get(organisationId, loadtestId, response);
     } else if (httpMethod == "POST") {
-      const customerId = pathParams[0];
       const loadtestId = uuid.v4();
-      const playbookId = JSON.parse(event.body).playbookId;
-      post_handler.post(customerId, loadtestId, playbookId, response);
+      handlers.post(organisationId, loadtestId, payload, response);
     } else {
       response(403, "Not supported.", config.headers);
     }

@@ -20,9 +20,12 @@ exports.get = (organisationId, domainName, response) => {
 
   promise
     .then((data) => {
-      const responseBody = {
-        data: data.Items.map(mapper.map),
-      };
+      const responseBody =
+        "Items" in data
+          ? {
+              data: data.Items.map(mapper.map),
+            }
+          : mapper.map(data.Item);
       response(200, responseBody, config.headers);
     })
     .catch((err) => {

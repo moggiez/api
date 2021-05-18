@@ -30,9 +30,12 @@ exports.get = (organisationId, playbookId, response) => {
       if (playbookId && data.Items.length == 1) {
         response(200, mapper.map(data.Items[0]), config.headers);
       } else {
-        const responseBody = {
-          data: data.Items.map(mapper.map),
-        };
+        const responseBody =
+          "Items" in data
+            ? {
+                data: data.Items.map(mapper.map),
+              }
+            : mapper.map(data.Item);
         response(200, responseBody, config.headers);
       }
     }

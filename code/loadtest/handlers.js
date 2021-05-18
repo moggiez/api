@@ -6,19 +6,23 @@ const mapper = require("./mapper");
 const table = new db.Table({
   tableName: config.tableName,
   hashKey: "OrganisationId",
-  sortKey: "UserId",
+  sortKey: "LoadtestId",
   indexes: {
-    UserOrganisations: {
+    PlaybookLoadtestIndex: {
+      hashKey: "PlaybookId",
+      sortKey: "LoadtestId",
+    },
+    UsersLoadtestsIndex: {
       hashKey: "UserId",
-      sortKey: "OrganisationId",
+      sortKey: "LoadtestId",
     },
   },
 });
 
-exports.get = (organisationId, userId, response) => {
+exports.get = (organisationId, loadtestId, response) => {
   let promise = null;
-  if (userId) {
-    promise = table.get(organisationId, userId);
+  if (loadtestId) {
+    promise = table.get(organisationId, loadtestId);
   } else {
     promise = table.getByPartitionKey(organisationId);
   }
@@ -38,23 +42,9 @@ exports.get = (organisationId, userId, response) => {
     });
 };
 
-exports.post = (organisationId, userId, payload, response) => {
+exports.post = (organisationId, loadtestId, payload, response) => {
   table
-    .create(organisationId, userId, payload)
-    .then((data) => response(200, data, config.headers))
-    .catch((err) => response(500, err, config.headers));
-};
-
-exports.put = (organisationId, userId, payload, response) => {
-  table
-    .update(organisationId, userId, payload)
-    .then((data) => response(200, data, config.headers))
-    .catch((err) => response(500, err, config.headers));
-};
-
-exports.delete = (organisationId, userId, response) => {
-  table
-    .delete(organisationId, userId)
+    .create(organisationId, loadtestId, payload)
     .then((data) => response(200, data, config.headers))
     .catch((err) => response(500, err, config.headers));
 };
