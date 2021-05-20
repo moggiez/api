@@ -6,6 +6,9 @@ version-build:
 build-cleanup:
 	rm -rf ./dist/* & mkdir -p dist
 
+modules-cleanup:
+	cd infrastructure && rm -rf .terraform/modules
+
 build-playbook-api:
 	cd code/playbook/ && zip -r ../../dist/playbook_api.$(VERSION).zip ./
 
@@ -40,10 +43,10 @@ infra-init:
 infra-debug:
 	cd infrastructure && TF_LOG=DEBUG terraform apply -auto-approve infra
 
-deploy: build
+deploy: build modules-cleanup
 	cd infrastructure && terraform init && TF_VAR_dist_version=$(VERSION) terraform apply -auto-approve
 
-preview: build
+preview: build modules-cleanup
 	cd infrastructure && terraform init && TF_VAR_dist_version=$(VERSION) terraform plan
 
 fmt:
