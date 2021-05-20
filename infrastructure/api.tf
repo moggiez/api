@@ -32,7 +32,7 @@ module "playbook_lambda_api" {
     aws_lambda_layer_version.auth.arn,
     aws_lambda_layer_version.lambda_helpers.arn
   ]
-  authorizer     = aws_api_gateway_authorizer._
+  authorizer = aws_api_gateway_authorizer._
 }
 
 module "playbook_lambda_api_proxy" {
@@ -61,7 +61,7 @@ module "loadtest_lambda_api" {
     aws_lambda_layer_version.auth.arn,
     aws_lambda_layer_version.lambda_helpers.arn
   ]
-  authorizer     = aws_api_gateway_authorizer._
+  authorizer = aws_api_gateway_authorizer._
 }
 
 module "loadtest_lambda_api_proxy" {
@@ -91,7 +91,7 @@ module "organisation_lambda_api" {
     aws_lambda_layer_version.auth.arn,
     aws_lambda_layer_version.lambda_helpers.arn
   ]
-  authorizer     = aws_api_gateway_authorizer._
+  authorizer = aws_api_gateway_authorizer._
 }
 
 module "organisation_lambda_api_proxy" {
@@ -121,7 +121,7 @@ module "domain_lambda_api" {
     aws_lambda_layer_version.auth.arn,
     aws_lambda_layer_version.lambda_helpers.arn
   ]
-  authorizer     = aws_api_gateway_authorizer._
+  authorizer = aws_api_gateway_authorizer._
 }
 
 module "domain_lambda_api_proxy" {
