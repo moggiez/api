@@ -45,6 +45,9 @@ exports.get = (organisationId, loadtestId, response) => {
 exports.post = (organisationId, loadtestId, payload, response) => {
   table
     .create(organisationId, loadtestId, payload)
-    .then((data) => response(200, data, config.headers))
+    .then((data) => {
+      data["LoadtestId"] = loadtestId;
+      response(200, data, config.headers);
+    })
     .catch((err) => response(500, err, config.headers));
 };
