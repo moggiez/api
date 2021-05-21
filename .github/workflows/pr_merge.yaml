@@ -23,10 +23,10 @@ jobs:
         shell: bash
 
     steps:
-      - name: setup-git-credentials
-        uses: fusion-engineering/setup-git-credentials@v2.0.6
+      - name: setup-git-ssh-key
+        uses: webfactory/ssh-agent@v0.5.2
         with:
-          credentials: https://GeorgiStavrev:{{secrets.GH_TOKEN}}@github.com
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
     
       # Checkout the repository to the GitHub Actions runner
