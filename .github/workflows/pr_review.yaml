@@ -22,7 +22,7 @@ jobs:
       - name: setup-git-credentials
         uses: fusion-engineering/setup-git-credentials@v2.0.6
         with:
-          credentials: https://foo:{{secrets.GH_TOKEN}}@github.com
+          credentials: https://GeorgiStavrev:{{secrets.GH_TOKEN}}@github.com
 
     
       # Checkout the repository to the GitHub Actions runner
