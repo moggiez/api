@@ -18,7 +18,7 @@ resource "aws_api_gateway_authorizer" "_" {
 
 # PLAYBOOK API
 module "playbook_lambda_api" {
-  source         = "git@github.com:moggiez/terraform-modules.git/lambda_api"
+  source         = "git@github.com:moggiez/terraform-modules.git//lambda_api"
   name           = "playbook"
   api            = aws_api_gateway_rest_api._
   dynamodb_table = "playbooks"
@@ -36,7 +36,7 @@ module "playbook_lambda_api" {
 }
 
 module "playbook_lambda_api_proxy" {
-  source              = "git@github.com:moggiez/terraform-modules.git/api_resource_proxy"
+  source              = "git@github.com:moggiez/terraform-modules.git//api_resource_proxy"
   api                 = aws_api_gateway_rest_api._
   http_methods        = local.http_methods
   parent_api_resource = module.playbook_lambda_api.api_resource
@@ -47,7 +47,7 @@ module "playbook_lambda_api_proxy" {
 
 # LOADTEST API
 module "loadtest_lambda_api" {
-  source         = "git@github.com:moggiez/terraform-modules.git/lambda_api"
+  source         = "git@github.com:moggiez/terraform-modules.git//lambda_api"
   name           = "loadtest"
   api            = aws_api_gateway_rest_api._
   dynamodb_table = "loadtests"
@@ -65,7 +65,7 @@ module "loadtest_lambda_api" {
 }
 
 module "loadtest_lambda_api_proxy" {
-  source              = "git@github.com:moggiez/terraform-modules.git/api_resource_proxy"
+  source              = "git@github.com:moggiez/terraform-modules.git//api_resource_proxy"
   api                 = aws_api_gateway_rest_api._
   http_methods        = local.http_methods
   parent_api_resource = module.loadtest_lambda_api.api_resource
@@ -77,7 +77,7 @@ module "loadtest_lambda_api_proxy" {
 
 # ORGANISATION API
 module "organisation_lambda_api" {
-  source         = "git@github.com:moggiez/terraform-modules.git/lambda_api"
+  source         = "git@github.com:moggiez/terraform-modules.git//lambda_api"
   name           = "organisation"
   api            = aws_api_gateway_rest_api._
   dynamodb_table = "organisations"
@@ -95,7 +95,7 @@ module "organisation_lambda_api" {
 }
 
 module "organisation_lambda_api_proxy" {
-  source              = "git@github.com:moggiez/terraform-modules.git/api_resource_proxy"
+  source              = "git@github.com:moggiez/terraform-modules.git//api_resource_proxy"
   api                 = aws_api_gateway_rest_api._
   http_methods        = local.http_methods
   parent_api_resource = module.organisation_lambda_api.api_resource
@@ -107,7 +107,7 @@ module "organisation_lambda_api_proxy" {
 
 # DOMAIN API
 module "domain_lambda_api" {
-  source         = "git@github.com:moggiez/terraform-modules.git/lambda_api"
+  source         = "git@github.com:moggiez/terraform-modules.git//lambda_api"
   name           = "domain"
   api            = aws_api_gateway_rest_api._
   dynamodb_table = "domains"
@@ -125,7 +125,7 @@ module "domain_lambda_api" {
 }
 
 module "domain_lambda_api_proxy" {
-  source              = "git@github.com:moggiez/terraform-modules.git/api_resource_proxy"
+  source              = "git@github.com:moggiez/terraform-modules.git//api_resource_proxy"
   api                 = aws_api_gateway_rest_api._
   http_methods        = local.http_methods
   parent_api_resource = module.domain_lambda_api.api_resource
@@ -137,7 +137,7 @@ module "domain_lambda_api_proxy" {
 
 # USER API
 module "user_lambda_api" {
-  source         = "git@github.com:moggiez/terraform-modules.git/lambda_api"
+  source         = "git@github.com:moggiez/terraform-modules.git//lambda_api"
   name           = "user"
   api            = aws_api_gateway_rest_api._
   dynamodb_table = "organisations"
@@ -155,7 +155,7 @@ module "user_lambda_api" {
 }
 
 module "user_lambda_api_proxy" {
-  source              = "git@github.com:moggiez/terraform-modules.git/api_resource_proxy"
+  source              = "git@github.com:moggiez/terraform-modules.git//api_resource_proxy"
   api                 = aws_api_gateway_rest_api._
   http_methods        = local.http_methods
   parent_api_resource = module.user_lambda_api.api_resource
@@ -198,7 +198,7 @@ resource "aws_api_gateway_stage" "api_stage" {
 
 # DOMAIN FOR THE API
 module "playbook_api_subdomain_mapping" {
-  source         = "git@github.com:moggiez/terraform-modules.git/api_subdomain_mapping"
+  source         = "git@github.com:moggiez/terraform-modules.git//api_subdomain_mapping"
   api            = aws_api_gateway_rest_api._
   api_stage_name = local.stage
   domain_name    = "moggies.io"
