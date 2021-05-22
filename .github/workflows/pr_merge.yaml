@@ -2,7 +2,11 @@ name: "Pull Request"
 
 on:
   pull_request:
-    types: [opened]
+    branches:
+      - master
+  push:
+    branches:
+      - master
 
 jobs:
   terraform:
@@ -19,6 +23,12 @@ jobs:
         shell: bash
 
     steps:
+      - name: setup-git-ssh-key
+        uses: webfactory/ssh-agent@v0.5.2
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    
       # Checkout the repository to the GitHub Actions runner
       - name: Checkout
         uses: actions/checkout@v2
@@ -50,6 +60,10 @@ jobs:
       - run: cd code/loadtest && npm install
       - run: cd code/organisation && npm install
       - run: cd code/domain && npm install
+      - run: cd code/user && npm install
+      - run: cd code/libs/db && npm install
+      - run: cd code/libs/auth && npm install
+      - run: cd code/libs/lambda_helpers && npm install
 
       # Build the lambda packages
       - name: Build lambda packages
