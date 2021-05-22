@@ -35,7 +35,9 @@ build-layer-lambda_helpers:
 
 build-layers: build-layer-db build-layer-auth build-layer-lambda_helpers
 
-build: build-cleanup build-layers build-playbook-api build-loadtest-api build-organisation-api build-domain-api build-user-api
+build-lambdas: build-playbook-api build-loadtest-api build-organisation-api build-domain-api build-user-api
+
+build: build-cleanup build-layers build-lambdas
 
 infra-init:
 	cd infrastructure && terraform init -force-copy -backend-config="bucket=moggies.io-terraform-state-backend" -backend-config="dynamodb_table=moggies.io-api-terraform_state" -backend-config="key=api-terraform.state" -backend-config="region=eu-west-1"
