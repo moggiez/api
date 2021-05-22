@@ -60,6 +60,7 @@ jobs:
       - run: cd code/loadtest && npm install
       - run: cd code/organisation && npm install
       - run: cd code/domain && npm install
+      - run: cd code/user && npm install
 
       # Build the lambda packages
       - name: Build lambda packages
