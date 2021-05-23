@@ -25,7 +25,6 @@ module "playbook_lambda_api" {
   path_part      = "playbook"
   bucket         = aws_s3_bucket.api_bucket
   http_methods   = local.http_methods
-  dist_version   = var.dist_version
   dist_dir       = "../dist"
   layers = [
     aws_lambda_layer_version.db.arn,
@@ -54,7 +53,6 @@ module "loadtest_lambda_api" {
   path_part      = "loadtest"
   bucket         = aws_s3_bucket.api_bucket
   http_methods   = local.http_methods
-  dist_version   = var.dist_version
   dist_dir       = "../dist"
   layers = [
     aws_lambda_layer_version.db.arn,
@@ -84,7 +82,6 @@ module "organisation_lambda_api" {
   path_part      = "organisation"
   bucket         = aws_s3_bucket.api_bucket
   http_methods   = local.http_methods
-  dist_version   = var.dist_version
   dist_dir       = "../dist"
   layers = [
     aws_lambda_layer_version.db.arn,
@@ -114,7 +111,6 @@ module "domain_lambda_api" {
   path_part      = "domain"
   bucket         = aws_s3_bucket.api_bucket
   http_methods   = local.http_methods
-  dist_version   = var.dist_version
   dist_dir       = "../dist"
   layers = [
     aws_lambda_layer_version.db.arn,
@@ -144,7 +140,6 @@ module "user_lambda_api" {
   path_part      = "user"
   bucket         = aws_s3_bucket.api_bucket
   http_methods   = local.http_methods
-  dist_version   = var.dist_version
   dist_dir       = "../dist"
   layers = [
     aws_lambda_layer_version.db.arn,

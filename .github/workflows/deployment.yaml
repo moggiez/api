@@ -52,20 +52,7 @@ jobs:
         with:
           node-version: "14"
 
-      - run: cd code/playbook && npm install
-      - run: cd code/loadtest && npm install
-      - run: cd code/organisation && npm install
-      - run: cd code/domain && npm install
-      - run: cd code/user && npm install
-      - run: cd code/libs/db && npm install
-      - run: cd code/libs/auth && npm install
-      - run: cd code/libs/lambda_helpers && npm install
-
-      # Build the lambda packages
-      - name: Build lambda packages
-        run: make build
-
-      # Generates an execution plan for Terraform
+      # Builds lambda packages and generates an execution plan for Terraform
       - name: Preview deployment
         run: make preview
         env:
