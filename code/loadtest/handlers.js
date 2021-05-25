@@ -3,21 +3,7 @@
 const config = require("./config");
 const db = require("db");
 const mapper = require("./mapper");
-const table = new db.Table({
-  tableName: config.tableName,
-  hashKey: "OrganisationId",
-  sortKey: "LoadtestId",
-  indexes: {
-    PlaybookLoadtestIndex: {
-      hashKey: "PlaybookId",
-      sortKey: "LoadtestId",
-    },
-    UsersLoadtestsIndex: {
-      hashKey: "UserId",
-      sortKey: "LoadtestId",
-    },
-  },
-});
+const table = new db.Table(db.tableConfigs.loadtests);
 
 exports.get = (organisationId, loadtestId, response) => {
   let promise = null;

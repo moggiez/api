@@ -3,17 +3,7 @@
 const config = require("./config");
 const db = require("db");
 const mapper = require("./mapper");
-const orgTable = new db.Table({
-  tableName: config.tableName,
-  hashKey: "OrganisationId",
-  sortKey: "UserId",
-  indexes: {
-    UserOrganisations: {
-      hashKey: "UserId",
-      sortKey: "OrganisationId",
-    },
-  },
-});
+const orgTable = new db.Table(db.tableConfigs.organisations);
 
 exports.getOrg = (userId, response) => {
   const promise = orgTable.getBySecondaryIndex("UserOrganisations", userId);
