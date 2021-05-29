@@ -176,23 +176,29 @@ module "metrics_lambda_api" {
   dynamodb_table = "loadtests"
   path_part      = "metrics"
   bucket         = aws_s3_bucket.api_bucket
-  http_methods   = local.http_methods
+  http_methods   = ["GET"]
   dist_dir       = "../dist"
   layers = [
+    aws_lambda_layer_version.db.arn,
     aws_lambda_layer_version.auth.arn,
     aws_lambda_layer_version.lambda_helpers.arn
   ]
-  policies = [aws_iam_policy.cloudwatch_metrics_read_access.arn]
-  //authorizer = aws_api_gateway_authorizer._
+  policies = [
+    aws_iam_policy.cloudwatch_metrics_read_access.arn,
+    aws_iam_policy.dynamodb_access_loadtests.arn,
+    aws_iam_policy.dynamodb_access_playbooks.arn,
+    aws_iam_policy.dynamodb_access_organisations.arn,
+  ]
+  authorizer = aws_api_gateway_authorizer._
 }
 
 module "metrics_lambda_api_proxy" {
   source              = "git@github.com:moggiez/terraform-modules.git//api_resource_proxy"
   api                 = aws_api_gateway_rest_api._
-  http_methods        = local.http_methods
+  http_methods        = ["GET"]
   parent_api_resource = module.metrics_lambda_api.api_resource
   lambda              = module.metrics_lambda_api.lambda
-  //authorizer          = aws_api_gateway_authorizer._
+  authorizer          = aws_api_gateway_authorizer._
 }
 
 # END METRICS API

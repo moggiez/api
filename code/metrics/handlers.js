@@ -1,11 +1,46 @@
 const AWS = require("aws-sdk");
-const uuid = require("uuid");
+const db = require("db");
 const config = require("./config");
 
+const organisations = new db.Table(db.tableConfigs.organisations);
+const loadtests = new db.Table(db.tableConfigs.loadtests);
 const CloudWatch = new AWS.CloudWatch({ apiVersion: "2010-08-01" });
-const getParams = () => {
-  const customerId = "default";
-  const loadtestId = "0255f23e-7e38-479b-8b09-dfb7d5526348";
+
+const getLoadtest = (user, loadtestId) => {
+  return new Promise((resolve, reject) => {
+    organisations
+      .getBySecondaryIndex("UserOrganisations", user.id)
+      .then((orgData) => {
+        if (orgData.Items.length == 0) {
+          reject("Organisation not found.");
+        } else {
+          const orgId = orgData.Items[0].OrganisationId;
+          loadtests
+            .get(orgId, loadtestId)
+            .then((loadtestData) => {
+              resolve(loadtestData.Item);
+            })
+            .catch((err) => {
+              console.log(err);
+              reject(err);
+            });
+        }
+      })
+      .catch((err) => {
+        console.log("Unable to fetch user organisations.", err);
+        reject(err);
+      });
+  });
+};
+
+const getParams = (loadtest) => {
+  const startDate = new Date(loadtest.StartDate);
+  let endDate = new Date(loadtest.UpdatedAt);
+  const seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+  if (seconds < 60) {
+    endDate.setSeconds(endDate.getSeconds() + 300);
+  }
+
   return {
     MetricDataQueries: [
       {
@@ -15,11 +50,11 @@ const getParams = () => {
             Dimensions: [
               {
                 Name: "CUSTOMER",
-                Value: customerId,
+                Value: loadtest.OrganisationId,
               },
               {
                 Name: "LOADTEST_ID",
-                Value: loadtestId,
+                Value: loadtest.LoadtestId,
               },
               {
                 Name: "STATUS",
@@ -31,7 +66,7 @@ const getParams = () => {
               },
             ],
             MetricName: "MOGGIEZ_RESPONSE_TIME",
-            Namespace: `MOGGIEZ/${customerId}/${loadtestId}`,
+            Namespace: `MOGGIEZ/${loadtest.OrganisationId}/${loadtest.LoadtestId}`,
           },
           Period: 1, // every second
           Stat: "Average",
@@ -40,15 +75,17 @@ const getParams = () => {
         ReturnData: true,
       },
     ],
-    StartTime: new Date("2021-05-29T13:33:58.339Z").toISOString(),
-    EndTime: new Date("2021-05-29T13:34:58.339Z").toISOString(),
+    StartTime: startDate.toISOString(),
+    EndTime: endDate.toISOString(),
     ScanBy: "TimestampAscending",
   };
 };
 
-const getMetricsData = () => {
+const getMetricsData = (loadtest) => {
   return new Promise((resolve, reject) => {
-    CloudWatch.getMetricData(getParams(), (err, data) => {
+    const params = getParams(loadtest);
+    console.log(JSON.stringify(params));
+    CloudWatch.getMetricData(params, (err, data) => {
       if (err) {
         reject(err);
       } else {
@@ -58,8 +95,19 @@ const getMetricsData = () => {
   });
 };
 
-exports.get = (response) => {
-  getMetricsData()
-    .then((data) => response(200, data, config.headers))
-    .catch((err) => response(500, err, config.headers));
+exports.get = (user, loadtestId, response) => {
+  getLoadtest(user, loadtestId)
+    .then((data) => {
+      if (data) {
+        getMetricsData(data)
+          .then((data) => response(200, data, config.headers))
+          .catch((err) => response(500, err, config.headers));
+      } else {
+        response(401, "Unauthorized", config.headers);
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      response(401, "Unauthorized", config.headers);
+    });
 };
