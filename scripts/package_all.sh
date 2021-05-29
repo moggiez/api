@@ -3,7 +3,7 @@
 CODE_DIR=$PWD/code
 LIBS_DIR=$PWD/code/libs
 DIST_DIR=$PWD/dist
-APIS=("user" "organisation" "domain" "playbook" "loadtest")
+APIS=("user" "organisation" "domain" "playbook" "loadtest" "metrics")
 LAYERS=("db" "auth" "lambda_helpers")
  
 for api in "${APIS[@]}"

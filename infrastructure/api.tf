@@ -160,11 +160,55 @@ module "user_lambda_api_proxy" {
 
 # END USER API
 
+# METRICS API
+resource "aws_iam_policy" "cloudwatch_metrics_read_access" {
+  name        = "metrics_api-CloudWatchMetricsReadAccess"
+  path        = "/"
+  description = "IAM policy getting metrics data from CloudWatch."
+
+  policy = templatefile("templates/cloudwatch_metrics_read_access_policy.json", {})
+}
+
+module "metrics_lambda_api" {
+  source         = "git@github.com:moggiez/terraform-modules.git//lambda_api"
+  name           = "metrics"
+  api            = aws_api_gateway_rest_api._
+  dynamodb_table = "loadtests"
+  path_part      = "metrics"
+  bucket         = aws_s3_bucket.api_bucket
+  http_methods   = local.http_methods
+  dist_dir       = "../dist"
+  layers = [
+    aws_lambda_layer_version.auth.arn,
+    aws_lambda_layer_version.lambda_helpers.arn
+  ]
+  policies = [aws_iam_policy.cloudwatch_metrics_read_access.arn]
+  //authorizer = aws_api_gateway_authorizer._
+}
+
+module "metrics_lambda_api_proxy" {
+  source              = "git@github.com:moggiez/terraform-modules.git//api_resource_proxy"
+  api                 = aws_api_gateway_rest_api._
+  http_methods        = local.http_methods
+  parent_api_resource = module.metrics_lambda_api.api_resource
+  lambda              = module.metrics_lambda_api.lambda
+  //authorizer          = aws_api_gateway_authorizer._
+}
+
+# END METRICS API
+
 # Deployment of the API Gateway
 resource "aws_api_gateway_deployment" "api_deployment" {
   for_each = local.stages
 
-  depends_on = [module.playbook_lambda_api, module.loadtest_lambda_api]
+  depends_on = [
+    module.playbook_lambda_api,
+    module.loadtest_lambda_api,
+    module.domain_lambda_api,
+    module.organisation_lambda_api,
+    module.user_lambda_api,
+    module.metrics_lambda_api
+  ]
 
   rest_api_id = aws_api_gateway_rest_api._.id
   description = each.value
