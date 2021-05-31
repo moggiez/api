@@ -176,7 +176,7 @@ module "metrics_lambda_api" {
   dynamodb_table = "loadtests"
   path_part      = "metrics"
   bucket         = aws_s3_bucket.api_bucket
-  http_methods   = ["GET"]
+  http_methods   = ["GET", "POST", "PUT"]
   dist_dir       = "../dist"
   layers = [
     aws_lambda_layer_version.db.arn,
@@ -188,6 +188,7 @@ module "metrics_lambda_api" {
     aws_iam_policy.dynamodb_access_loadtests.arn,
     aws_iam_policy.dynamodb_access_playbooks.arn,
     aws_iam_policy.dynamodb_access_organisations.arn,
+    aws_iam_policy.dynamodb_access_loadtest_metrics.arn
   ]
   authorizer = aws_api_gateway_authorizer._
 }
@@ -195,7 +196,7 @@ module "metrics_lambda_api" {
 module "metrics_lambda_api_proxy" {
   source              = "git@github.com:moggiez/terraform-modules.git//api_resource_proxy"
   api                 = aws_api_gateway_rest_api._
-  http_methods        = ["GET"]
+  http_methods        = ["GET", "POST", "PUT"]
   parent_api_resource = module.metrics_lambda_api.api_resource
   lambda              = module.metrics_lambda_api.lambda
   authorizer          = aws_api_gateway_authorizer._

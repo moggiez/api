@@ -4,6 +4,7 @@ const config = require("./config");
 
 const organisations = new db.Table(db.tableConfigs.organisations);
 const loadtests = new db.Table(db.tableConfigs.loadtests);
+const loadtest_metrics = new db.Table(db.tableConfigs.loadtest_metrics);
 const CloudWatch = new AWS.CloudWatch({ apiVersion: "2010-08-01" });
 
 const getLoadtest = (user, loadtestId) => {
@@ -65,8 +66,8 @@ const getParams = (loadtest) => {
                 Value: "de3150ab-ce1b-497b-9333-41420cde9091",
               },
             ],
-            MetricName: "MOGGIEZ_RESPONSE_TIME",
-            Namespace: `MOGGIEZ/${loadtest.OrganisationId}/${loadtest.LoadtestId}`,
+            MetricName: "ResponseTime",
+            Namespace: `moggies.io/Loadtests`,
           },
           Period: 1, // every second
           Stat: "Average",
@@ -110,4 +111,23 @@ exports.get = (user, loadtestId, response) => {
       console.log(err);
       response(401, "Unauthorized", config.headers);
     });
+};
+
+exports.post = (user, loadtestId, metricName, data, response) => {
+  try {
+    const orgData = await organisations.getBySecondaryIndex(
+      "UserOrganisations",
+      user.id
+    );
+    const orgId = orgData.Items[0].OrganisationId;
+    const loadtestData = await loadtests.get(orgId, loadtestId);
+    const loadtest = loadtestData.Item;
+    if (loadtest && loadtest != null) {
+      await loadtest_metrics.create(loadtestId, metricName, { Data: data });
+      response(201, "Created", config.headers);
+    }
+  } catch (err) {
+    console.log(err);
+    response(500, "Internal server error", config.headers);
+  }
 };
