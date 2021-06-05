@@ -23,60 +23,15 @@ const getLoadtest = async (user, loadtestId) => {
   }
 };
 
-const getParams = (loadtest) => {
-  const startDate = new Date(loadtest.StartDate);
-  let endDate = new Date(loadtest.UpdatedAt);
-  const seconds = (endDate.getTime() - startDate.getTime()) / 1000;
-  if (seconds < 60) {
-    endDate.setSeconds(endDate.getSeconds() + 300);
-  }
-
-  return {
-    MetricDataQueries: [
-      {
-        Id: "myrequest",
-        MetricStat: {
-          Metric: {
-            Dimensions: [
-              {
-                Name: "CUSTOMER",
-                Value: loadtest.OrganisationId,
-              },
-              {
-                Name: "LOADTEST_ID",
-                Value: loadtest.LoadtestId,
-              },
-              {
-                Name: "STATUS",
-                Value: "200",
-              },
-              {
-                Name: "USER_ID",
-                Value: "de3150ab-ce1b-497b-9333-41420cde9091",
-              },
-            ],
-            MetricName: "ResponseTime",
-            Namespace: `moggies.io/Loadtests`,
-          },
-          Period: 1, // every second
-          Stat: "Average",
-          Unit: "Milliseconds",
-        },
-        ReturnData: true,
-      },
-    ],
-    StartTime: startDate.toISOString(),
-    EndTime: endDate.toISOString(),
-    ScanBy: "TimestampAscending",
-  };
-};
-
 exports.get = async (user, loadtestId, response) => {
   try {
     const data = await getLoadtest(user, loadtestId);
     if (data) {
       try {
-        const params = getParams(data);
+        const params = Metrics.generateGetMetricsDataParamsForLoadtest(
+          data,
+          "ResponseTime"
+        );
         const metricsData = await Metrics.getMetricsData(params);
         console.log("metricsData", metricsData);
         response(200, metricsData, config.headers);
