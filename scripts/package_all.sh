@@ -4,7 +4,7 @@ CODE_DIR=$PWD/code
 LIBS_DIR=$PWD/code/libs
 DIST_DIR=$PWD/dist
 APIS=("user" "organisation" "domain" "playbook" "loadtest" "metrics")
-LAYERS=("db" "auth" "lambda_helpers")
+LAYERS=("db" "auth" "lambda_helpers" "metrics")
  
 for api in "${APIS[@]}"
 do

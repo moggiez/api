@@ -181,7 +181,8 @@ module "metrics_lambda_api" {
   layers = [
     aws_lambda_layer_version.db.arn,
     aws_lambda_layer_version.auth.arn,
-    aws_lambda_layer_version.lambda_helpers.arn
+    aws_lambda_layer_version.lambda_helpers.arn,
+    aws_lambda_layer_version.metrics.arn
   ]
   policies = [
     aws_iam_policy.cloudwatch_metrics_read_access.arn,

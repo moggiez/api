@@ -1,11 +1,13 @@
 const AWS = require("aws-sdk");
 const db = require("db");
 const config = require("./config");
+const metricsHelpers = require("metrics");
 
 const organisations = new db.Table(db.tableConfigs.organisations);
 const loadtests = new db.Table(db.tableConfigs.loadtests);
 const loadtest_metrics = new db.Table(db.tableConfigs.loadtest_metrics);
 const CloudWatch = new AWS.CloudWatch({ apiVersion: "2010-08-01" });
+const Metrics = new metricsHelpers.Metrics(CloudWatch);
 
 const getLoadtest = async (user, loadtestId) => {
   const orgData = await organisations.getBySecondaryIndex(
@@ -69,28 +71,17 @@ const getParams = (loadtest) => {
   };
 };
 
-const getMetricsData = (loadtest) => {
-  return new Promise((resolve, reject) => {
-    const params = getParams(loadtest);
-    console.log(JSON.stringify(params));
-    CloudWatch.getMetricData(params, (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(data);
-      }
-    });
-  });
-};
-
 exports.get = async (user, loadtestId, response) => {
   try {
     const data = await getLoadtest(user, loadtestId);
     if (data) {
       try {
-        const metricsData = await getMetricsData(data);
+        const params = getParams(data);
+        const metricsData = await Metrics.getMetricsData(params);
+        console.log("metricsData", metricsData);
         response(200, metricsData, config.headers);
       } catch (exc2) {
+        console.log(exc2);
         response(500, "Internal server error.", config.headers);
       }
     } else {

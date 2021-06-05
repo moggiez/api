@@ -21,3 +21,11 @@ resource "aws_lambda_layer_version" "lambda_helpers" {
 
   compatible_runtimes = ["nodejs14.x"]
 }
+
+resource "aws_lambda_layer_version" "metrics" {
+  filename         = "../dist/metrics_layer.zip"
+  source_code_hash = filebase64sha256("../dist/metrics_layer.zip")
+  layer_name       = "moggies_layer_metrics"
+
+  compatible_runtimes = ["nodejs14.x"]
+}
