@@ -7,31 +7,18 @@ const loadtests = new db.Table(db.tableConfigs.loadtests);
 const loadtest_metrics = new db.Table(db.tableConfigs.loadtest_metrics);
 const CloudWatch = new AWS.CloudWatch({ apiVersion: "2010-08-01" });
 
-const getLoadtest = (user, loadtestId) => {
-  return new Promise((resolve, reject) => {
-    organisations
-      .getBySecondaryIndex("UserOrganisations", user.id)
-      .then((orgData) => {
-        if (orgData.Items.length == 0) {
-          reject("Organisation not found.");
-        } else {
-          const orgId = orgData.Items[0].OrganisationId;
-          loadtests
-            .get(orgId, loadtestId)
-            .then((loadtestData) => {
-              resolve(loadtestData.Item);
-            })
-            .catch((err) => {
-              console.log(err);
-              reject(err);
-            });
-        }
-      })
-      .catch((err) => {
-        console.log("Unable to fetch user organisations.", err);
-        reject(err);
-      });
-  });
+const getLoadtest = async (user, loadtestId) => {
+  const orgData = await organisations.getBySecondaryIndex(
+    "UserOrganisations",
+    user.id
+  );
+  if (orgData.Items.length == 0) {
+    throw new Error("Organisation not found.");
+  } else {
+    const orgId = orgData.Items[0].OrganisationId;
+    const loadtestData = await loadtests.get(orgId, loadtestId);
+    return loadtestData.Item;
+  }
 };
 
 const getParams = (loadtest) => {
@@ -96,24 +83,26 @@ const getMetricsData = (loadtest) => {
   });
 };
 
-exports.get = (user, loadtestId, response) => {
-  getLoadtest(user, loadtestId)
-    .then((data) => {
-      if (data) {
-        getMetricsData(data)
-          .then((data) => response(200, data, config.headers))
-          .catch((err) => response(500, err, config.headers));
-      } else {
-        response(401, "Unauthorized", config.headers);
+exports.get = async (user, loadtestId, response) => {
+  try {
+    const data = await getLoadtest(user, loadtestId);
+    if (data) {
+      try {
+        const metricsData = await getMetricsData(data);
+        response(200, metricsData, config.headers);
+      } catch (exc2) {
+        response(500, "Internal server error.", config.headers);
       }
-    })
-    .catch((err) => {
-      console.log(err);
+    } else {
       response(401, "Unauthorized", config.headers);
-    });
+    }
+  } catch (exc) {
+    console.log(exc);
+    response(401, "Unauthorized" + exc, config.headers);
+  }
 };
 
-exports.post = (user, loadtestId, metricName, data, response) => {
+exports.post = async (user, loadtestId, metricName, data, response) => {
   try {
     const orgData = await organisations.getBySecondaryIndex(
       "UserOrganisations",
