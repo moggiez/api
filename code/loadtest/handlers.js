@@ -29,6 +29,8 @@ exports.get = (organisationId, loadtestId, response) => {
 };
 
 exports.post = (organisationId, loadtestId, payload, response) => {
+  payload["CreatedAtHour"] = new Date().toISOString().substring(0, 13);
+  payload["MetricsSavedDate"] = "null";
   table
     .create(organisationId, loadtestId, payload)
     .then((data) => {
