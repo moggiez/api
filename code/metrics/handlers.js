@@ -23,28 +23,62 @@ const getLoadtest = async (user, loadtestId) => {
   }
 };
 
-exports.get = async (user, loadtestId, response) => {
+const getFromDB = async (loadtestId, metricName) => {
   try {
-    const data = await getLoadtest(user, loadtestId);
-    if (data) {
-      try {
-        const params = Metrics.generateGetMetricsDataParamsForLoadtest(
-          data,
-          "ResponseTime"
-        );
-        const metricsData = await Metrics.getMetricsData(params);
-        console.log("metricsData", metricsData);
-        response(200, metricsData, config.headers);
-      } catch (exc2) {
-        console.log(exc2);
-        response(500, "Internal server error.", config.headers);
-      }
+    const loadtestMetricsData = await loadtest_metrics.get(
+      loadtestId,
+      metricName
+    );
+    if (loadtestMetricsData && "Item" in loadtestMetricsData) {
+      return loadtestMetricsData.Item;
     } else {
-      response(401, "Unauthorized", config.headers);
+      return null;
     }
   } catch (exc) {
     console.log(exc);
-    response(401, "Unauthorized" + exc, config.headers);
+    throw new Error(exc);
+  }
+};
+
+const getFromCW = async (loadtest, metricName) => {
+  try {
+    const params = Metrics.generateGetMetricsDataParamsForLoadtest(
+      loadtest,
+      metricName
+    );
+    const metricsData = await Metrics.getMetricsData(params);
+    metricsData["Source"] = "CW";
+    return metricsData;
+  } catch (exc2) {
+    console.log(exc2);
+    throw new Error(exc2);
+  }
+};
+
+exports.get = async (user, loadtestId, metricName, response) => {
+  try {
+    const data = await getLoadtest(user, loadtestId);
+    if (!data) {
+      response(401, "Unauthorized");
+    }
+
+    try {
+      const fromDB = await getFromDB(loadtestId, metricName);
+      if (fromDB == null) {
+        const fromCW = await getFromCW(data, metricName);
+        console.log("returned from CW");
+        response(200, fromCW);
+      } else {
+        console.log("returned from DB");
+        response(200, { ...fromDB.MetricsData, UpdatedAt: fromDB.UpdatedAt });
+      }
+    } catch (exc) {
+      console.log(exc);
+      response(500, "Internal server error.");
+    }
+  } catch (errGetLoadtest) {
+    console.log(errGetLoadtest);
+    response(401, "Unauthorized");
   }
 };
 

@@ -18,7 +18,7 @@ exports.handler = async function (event, context, callback) {
     const loadtestId = request.getPathParamAtIndex(0, "");
     const metricName = request.getPathParamAtIndex(1, "ResponseTime");
     if (request.httpMethod == "GET") {
-      await handlers.get(user, loadtestId, response);
+      await handlers.get(user, loadtestId, metricName, response);
     } else if (request.httpMethod == "POST") {
       await handlers.post(user, loadtestId, metricName, request.body, response);
     } else {
