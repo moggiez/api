@@ -5,6 +5,10 @@
   "keywords": [
     "moggiez"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "moggies-auth": "^0.1.0",
+    "moggies-lambda-helpers": "^0.1.0",
+    "moggies-metrics": "^0.1.0"
+  },
   "scripts": {}
 }

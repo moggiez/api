@@ -1,6 +1,6 @@
 "use strict";
 
-const db = require("db");
+const db = require("moggies-db");
 const table = new db.Table(db.tableConfigs.playbooks);
 const mapper = require("./mapper");
 const config = require("./config");

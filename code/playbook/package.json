@@ -6,6 +6,8 @@
     "moggiez"
   ],
   "dependencies": {
+    "moggies-db": "^0.1.0",
+    "moggies-lambda-helpers": "^0.1.0",
     "uuid": "^8.3.2"
   },
   "scripts": {}

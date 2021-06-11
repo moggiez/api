@@ -1,7 +1,7 @@
 const AWS = require("aws-sdk");
-const db = require("db");
+const db = require("moggies-db");
 const config = require("./config");
-const metricsHelpers = require("metrics");
+const metricsHelpers = require("moggies-metrics");
 
 const organisations = new db.Table(db.tableConfigs.organisations);
 const loadtests = new db.Table(db.tableConfigs.loadtests);
