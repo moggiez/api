@@ -7,6 +7,7 @@
   ],
   "dependencies": {
     "moggies-auth": "^0.1.0",
+    "moggies-db": "^0.1.0",
     "moggies-lambda-helpers": "^0.1.0",
     "moggies-metrics": "^0.1.0"
   },
