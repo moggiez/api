@@ -27,3 +27,6 @@ fmt:
 
 undeploy:
 	cd infrastructure && terraform destroy
+
+repo-publish:
+	./scripts/publish_npm_packages.sh

@@ -6,6 +6,35 @@ on:
       - master
 
 jobs:
+  npm-packages:
+    name: "Publishes npm packages to team NPM repostiroy"
+    runs-on: ubuntu-latest
+    environment: production
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: eu-west-1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+
+      - name: Login to repo
+        run: aws codeartifact login --tool npm --repository team-npm --domain moggies-io --domain-owner ${{ secrets.AWS_ACCOUNT_ID }}
+
+      - name: Publish npm packages
+        run: make repo-publish
+        continue-on-error: true
+
   terraform:
     name: "Infrastructure as code"
     runs-on: ubuntu-latest
