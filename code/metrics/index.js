@@ -1,9 +1,9 @@
 "use strict";
 
-const auth = require("cognitoAuth");
+const auth = require("moggies-auth");
 const config = require("./config");
 const handlers = require("./handlers");
-const helpers = require("lambda_helpers");
+const helpers = require("moggies-lambda-helpers");
 
 exports.handler = async function (event, context, callback) {
   const response = helpers.getResponseFn(callback);

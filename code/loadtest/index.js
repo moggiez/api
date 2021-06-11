@@ -1,8 +1,8 @@
 "use strict";
 
 const config = require("./config");
-const helpers = require("lambda_helpers");
-const auth = require("cognitoAuth");
+const helpers = require("moggies-lambda-helpers");
+const auth = require("moggies-auth");
 const uuid = require("uuid");
 const handlers = require("./handlers");
 

@@ -2,7 +2,7 @@
 
 const uuid = require("uuid");
 const config = require("./config");
-const helpers = require("lambda_helpers");
+const helpers = require("moggies-lambda-helpers");
 const handlers = require("./handlers");
 
 exports.handler = function (event, context, callback) {
