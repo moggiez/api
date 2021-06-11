@@ -36,7 +36,6 @@ jobs:
 
       - name: Publish npm packages
         run: make repo-publish
-        continue-on-error: true
 
   terraform:
     name: "Infrastructure as code"
