@@ -15,19 +15,9 @@ exports.handler = function (event, context, callback) {
   const user = auth.getUserFromEvent(event);
 
   const httpMethod = event.httpMethod;
-  const pathParameters = event.pathParameters;
-  const pathParams =
-    pathParameters != null && "proxy" in pathParameters && pathParameters.proxy
-      ? pathParameters.proxy.split("/")
-      : [];
-  const userId = pathParams[0];
   try {
     if (httpMethod == "GET") {
-      if (userId == user.id) {
-        handlers.getOrg(userId, response);
-      } else {
-        response(403, "Not authorized.", config.headers);
-      }
+      handlers.getOrg(user.id, response);
     } else {
       response(500, "Not supported.", config.headers);
     }

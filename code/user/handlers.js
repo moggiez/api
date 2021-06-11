@@ -3,22 +3,19 @@
 const config = require("./config");
 const db = require("db");
 const mapper = require("./mapper");
-const orgTable = new db.Table(db.tableConfigs.organisations);
+const organisations = new db.Table(db.tableConfigs.organisations);
 
-exports.getOrg = (userId, response) => {
-  const promise = orgTable.getBySecondaryIndex("UserOrganisations", userId);
-
-  promise
-    .then((data) => {
-      const responseBody =
-        "Items" in data
-          ? {
-              data: data.Items.map(mapper.map),
-            }
-          : mapper.map(data.Item);
-      response(200, responseBody, config.headers);
-    })
-    .catch((err) => {
-      response(500, err, config.headers);
-    });
+exports.getOrg = async (userId, response) => {
+  try {
+    const data = await organisations.getBySecondaryIndex(
+      "UserOrganisations",
+      userId
+    );
+    const org = await organisations.get(data.Items[0].OrganisationId, userId);
+    console.log("org", JSON.stringify(org));
+    response(200, org.Item, config.headers);
+  } catch (err) {
+    console.log(err);
+    response(500, err, config.headers);
+  }
 };
