@@ -26,11 +26,6 @@ module "playbook_lambda_api" {
   bucket         = aws_s3_bucket.api_bucket
   http_methods   = local.http_methods
   dist_dir       = "../dist"
-  layers = [
-    aws_lambda_layer_version.db.arn,
-    aws_lambda_layer_version.auth.arn,
-    aws_lambda_layer_version.lambda_helpers.arn
-  ]
   authorizer = aws_api_gateway_authorizer._
 }
 
@@ -54,11 +49,6 @@ module "loadtest_lambda_api" {
   bucket         = aws_s3_bucket.api_bucket
   http_methods   = local.http_methods
   dist_dir       = "../dist"
-  layers = [
-    aws_lambda_layer_version.db.arn,
-    aws_lambda_layer_version.auth.arn,
-    aws_lambda_layer_version.lambda_helpers.arn
-  ]
   authorizer = aws_api_gateway_authorizer._
 }
 
@@ -83,11 +73,6 @@ module "organisation_lambda_api" {
   bucket         = aws_s3_bucket.api_bucket
   http_methods   = local.http_methods
   dist_dir       = "../dist"
-  layers = [
-    aws_lambda_layer_version.db.arn,
-    aws_lambda_layer_version.auth.arn,
-    aws_lambda_layer_version.lambda_helpers.arn
-  ]
   authorizer = aws_api_gateway_authorizer._
 }
 
@@ -112,11 +97,6 @@ module "domain_lambda_api" {
   bucket         = aws_s3_bucket.api_bucket
   http_methods   = local.http_methods
   dist_dir       = "../dist"
-  layers = [
-    aws_lambda_layer_version.db.arn,
-    aws_lambda_layer_version.auth.arn,
-    aws_lambda_layer_version.lambda_helpers.arn
-  ]
   authorizer = aws_api_gateway_authorizer._
 }
 
@@ -141,11 +121,6 @@ module "user_lambda_api" {
   bucket         = aws_s3_bucket.api_bucket
   http_methods   = local.http_methods
   dist_dir       = "../dist"
-  layers = [
-    aws_lambda_layer_version.db.arn,
-    aws_lambda_layer_version.auth.arn,
-    aws_lambda_layer_version.lambda_helpers.arn
-  ]
   authorizer = aws_api_gateway_authorizer._
 }
 
@@ -178,12 +153,6 @@ module "metrics_lambda_api" {
   bucket         = aws_s3_bucket.api_bucket
   http_methods   = ["GET", "POST", "PUT"]
   dist_dir       = "../dist"
-  layers = [
-    aws_lambda_layer_version.db.arn,
-    aws_lambda_layer_version.auth.arn,
-    aws_lambda_layer_version.lambda_helpers.arn,
-    aws_lambda_layer_version.metrics.arn
-  ]
   policies = [
     aws_iam_policy.cloudwatch_metrics_read_access.arn,
     aws_iam_policy.dynamodb_access_loadtests.arn,
