@@ -1,4 +1,22 @@
+# API
+
+Lambdas providing CRUD operations on data stored in DynamoDB.
+
+- user
+- organisation
+- domain
+- playbook
+- loadtest
+- metrics
+
+and libraries encapsulating common functionalities like database access, metrics, authentorization, etc.
+
 # Development
+
+TL;DR;
+
+- Scrips are used to package lambdas and NPM packages
+- Makefile used to perform previews, actual deployments, linting of the code and other common operations
 
 ## Setting up the development environment
 
