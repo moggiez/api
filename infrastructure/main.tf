@@ -22,27 +22,12 @@ provider "aws" {
   region = "us-east-1"
 }
 
-resource "aws_s3_bucket" "api_bucket" {
-  bucket = "moggiez-api-lambdas"
-  acl    = "private"
-
-  tags = {
-    Project = var.application
-  }
+data "aws_route53_zone" "public" {
+  private_zone = false
+  name         = var.domain_name
 }
 
-resource "aws_s3_bucket_public_access_block" "bucket_block_public_access" {
-  bucket = aws_s3_bucket.api_bucket.id
-
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-# this doesn't work yet, don't know why
 locals {
-  tags = {
-    Project = var.application
-  }
+  hosted_zone           = data.aws_route53_zone.public
+  authorization_enabled = true
 }

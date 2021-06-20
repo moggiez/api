@@ -16,6 +16,10 @@ resource "aws_api_gateway_authorizer" "_" {
   provider_arns = ["arn:aws:cognito-idp:${var.region}:${var.account}:userpool/${var.user_pool_id}"]
 }
 
+locals {
+  authorizer = local.authorization_enabled ? aws_api_gateway_authorizer._ : null
+}
+
 # PLAYBOOK API
 module "playbook_lambda_api" {
   source         = "git@github.com:moggiez/terraform-modules.git//lambda_api"
@@ -26,7 +30,7 @@ module "playbook_lambda_api" {
   bucket         = aws_s3_bucket.api_bucket
   http_methods   = local.http_methods
   dist_dir       = "../dist"
-  authorizer     = aws_api_gateway_authorizer._
+  authorizer     = local.authorizer
 }
 
 module "playbook_lambda_api_proxy" {
@@ -35,7 +39,7 @@ module "playbook_lambda_api_proxy" {
   http_methods        = local.http_methods
   parent_api_resource = module.playbook_lambda_api.api_resource
   lambda              = module.playbook_lambda_api.lambda
-  authorizer          = aws_api_gateway_authorizer._
+  authorizer          = local.authorizer
 }
 # END PLAYBOOK API
 
@@ -49,7 +53,7 @@ module "loadtest_lambda_api" {
   bucket         = aws_s3_bucket.api_bucket
   http_methods   = local.http_methods
   dist_dir       = "../dist"
-  authorizer     = aws_api_gateway_authorizer._
+  authorizer     = local.authorizer
 }
 
 module "loadtest_lambda_api_proxy" {
@@ -58,7 +62,7 @@ module "loadtest_lambda_api_proxy" {
   http_methods        = local.http_methods
   parent_api_resource = module.loadtest_lambda_api.api_resource
   lambda              = module.loadtest_lambda_api.lambda
-  authorizer          = aws_api_gateway_authorizer._
+  authorizer          = local.authorizer
 }
 
 # END LOADTEST API
@@ -73,7 +77,7 @@ module "organisation_lambda_api" {
   bucket         = aws_s3_bucket.api_bucket
   http_methods   = local.http_methods
   dist_dir       = "../dist"
-  authorizer     = aws_api_gateway_authorizer._
+  authorizer     = local.authorizer
 }
 
 module "organisation_lambda_api_proxy" {
@@ -82,7 +86,7 @@ module "organisation_lambda_api_proxy" {
   http_methods        = local.http_methods
   parent_api_resource = module.organisation_lambda_api.api_resource
   lambda              = module.organisation_lambda_api.lambda
-  authorizer          = aws_api_gateway_authorizer._
+  authorizer          = local.authorizer
 }
 
 # END ORGANISATION API
@@ -97,7 +101,7 @@ module "domain_lambda_api" {
   bucket         = aws_s3_bucket.api_bucket
   http_methods   = local.http_methods
   dist_dir       = "../dist"
-  authorizer     = aws_api_gateway_authorizer._
+  authorizer     = local.authorizer
 }
 
 module "domain_lambda_api_proxy" {
@@ -106,7 +110,7 @@ module "domain_lambda_api_proxy" {
   http_methods        = local.http_methods
   parent_api_resource = module.domain_lambda_api.api_resource
   lambda              = module.domain_lambda_api.lambda
-  authorizer          = aws_api_gateway_authorizer._
+  authorizer          = local.authorizer
 }
 
 # END DOMAIN API
@@ -121,7 +125,7 @@ module "user_lambda_api" {
   bucket         = aws_s3_bucket.api_bucket
   http_methods   = local.http_methods
   dist_dir       = "../dist"
-  authorizer     = aws_api_gateway_authorizer._
+  authorizer     = local.authorizer
 }
 
 module "user_lambda_api_proxy" {
@@ -130,7 +134,7 @@ module "user_lambda_api_proxy" {
   http_methods        = local.http_methods
   parent_api_resource = module.user_lambda_api.api_resource
   lambda              = module.user_lambda_api.lambda
-  authorizer          = aws_api_gateway_authorizer._
+  authorizer          = local.authorizer
 }
 
 # END USER API
@@ -160,7 +164,7 @@ module "metrics_lambda_api" {
     aws_iam_policy.dynamodb_access_organisations.arn,
     aws_iam_policy.dynamodb_access_loadtest_metrics.arn
   ]
-  authorizer = aws_api_gateway_authorizer._
+  authorizer = local.authorizer
 }
 
 module "metrics_lambda_api_proxy" {
@@ -169,7 +173,7 @@ module "metrics_lambda_api_proxy" {
   http_methods        = ["GET", "POST", "PUT"]
   parent_api_resource = module.metrics_lambda_api.api_resource
   lambda              = module.metrics_lambda_api.lambda
-  authorizer          = aws_api_gateway_authorizer._
+  authorizer          = local.authorizer
 }
 
 # END METRICS API
@@ -214,11 +218,13 @@ resource "aws_api_gateway_stage" "api_stage" {
 
 # DOMAIN FOR THE API
 module "playbook_api_subdomain_mapping" {
-  source         = "git@github.com:moggiez/terraform-modules.git//api_subdomain_mapping"
-  api            = aws_api_gateway_rest_api._
-  api_stage_name = local.stage
-  domain_name    = "moggies.io"
-  api_subdomain  = "api"
+  source          = "git@github.com:moggiez/terraform-modules.git//api_subdomain_mapping"
+  api             = aws_api_gateway_rest_api._
+  api_stage_name  = local.stage
+  api_subdomain   = "api"
+  certificate_arn = aws_acm_certificate._.arn
+  domain_name     = "moggies.io"
+  hosted_zone_id  = local.hosted_zone.zone_id
 }
 
 # END DOMAIN FOR THE API

@@ -22,3 +22,8 @@ variable "user_pool_id" {
   type    = string
   default = "eu-west-1_SPWgZjaBY"
 }
+
+variable "domain_name" {
+  type    = string
+  default = "moggies.io"
+}
