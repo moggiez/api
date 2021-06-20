@@ -24,6 +24,7 @@ exports.get = (organisationId, loadtestId, response) => {
       response(200, responseBody, config.headers);
     })
     .catch((err) => {
+      console.log(err);
       response(500, err, config.headers);
     });
 };
@@ -37,5 +38,8 @@ exports.post = (organisationId, loadtestId, payload, response) => {
       data["LoadtestId"] = loadtestId;
       response(200, data, config.headers);
     })
-    .catch((err) => response(500, err, config.headers));
+    .catch((err) => {
+      console.log(err);
+      response(500, err, config.headers);
+    });
 };

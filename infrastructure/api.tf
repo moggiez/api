@@ -31,6 +31,7 @@ module "playbook_lambda_api" {
   http_methods   = local.http_methods
   dist_dir       = "../dist"
   authorizer     = local.authorizer
+  environment    = local.environment
 }
 
 module "playbook_lambda_api_proxy" {
@@ -54,6 +55,7 @@ module "loadtest_lambda_api" {
   http_methods   = local.http_methods
   dist_dir       = "../dist"
   authorizer     = local.authorizer
+  environment    = local.environment
 }
 
 module "loadtest_lambda_api_proxy" {
@@ -78,6 +80,7 @@ module "organisation_lambda_api" {
   http_methods   = local.http_methods
   dist_dir       = "../dist"
   authorizer     = local.authorizer
+  environment    = local.environment
 }
 
 module "organisation_lambda_api_proxy" {
@@ -102,6 +105,7 @@ module "domain_lambda_api" {
   http_methods   = local.http_methods
   dist_dir       = "../dist"
   authorizer     = local.authorizer
+  environment    = local.environment
 }
 
 module "domain_lambda_api_proxy" {
@@ -126,6 +130,7 @@ module "user_lambda_api" {
   http_methods   = local.http_methods
   dist_dir       = "../dist"
   authorizer     = local.authorizer
+  environment    = local.environment
 }
 
 module "user_lambda_api_proxy" {
@@ -165,6 +170,7 @@ module "metrics_lambda_api" {
     aws_iam_policy.dynamodb_access_loadtest_metrics.arn
   ]
   authorizer = local.authorizer
+  environment    = local.environment
 }
 
 module "metrics_lambda_api_proxy" {
@@ -215,16 +221,3 @@ resource "aws_api_gateway_stage" "api_stage" {
     create_before_destroy = true
   }
 }
-
-# DOMAIN FOR THE API
-module "playbook_api_subdomain_mapping" {
-  source          = "git@github.com:moggiez/terraform-modules.git//api_subdomain_mapping"
-  api             = aws_api_gateway_rest_api._
-  api_stage_name  = local.stage
-  api_subdomain   = "api"
-  certificate_arn = aws_acm_certificate._.arn
-  domain_name     = "moggies.io"
-  hosted_zone_id  = local.hosted_zone.zone_id
-}
-
-# END DOMAIN FOR THE API

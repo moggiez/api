@@ -39,6 +39,7 @@ exports.handler = function (event, context, callback) {
       response(403, "Not supported.", config.headers);
     }
   } catch (err) {
+    console.log(err);
     response(500, err, config.headers);
   }
 };

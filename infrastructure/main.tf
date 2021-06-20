@@ -30,4 +30,5 @@ data "aws_route53_zone" "public" {
 locals {
   hosted_zone           = data.aws_route53_zone.public
   authorization_enabled = true
+  environment           = "PROD"
 }
