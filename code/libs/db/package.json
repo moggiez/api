@@ -8,7 +8,9 @@
     "moggies"
   ],
   "dependencies": {},
-  "scripts": {},
+  "scripts": {
+    "test": "jest"
+  },
   "description": "Database utilities for moggies.io",
   "main": "db.js",
   "repository": {
@@ -20,5 +22,10 @@
   "bugs": {
     "url": "https://github.com/moggiez/api/issues"
   },
-  "homepage": "https://github.com/moggiez/api#readme"
+  "homepage": "https://github.com/moggiez/api#readme",
+  "jest": {
+    "testPathIgnorePatterns": [
+      "__tests__/helpers.js"
+    ]
+  }
 }

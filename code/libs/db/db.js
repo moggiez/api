@@ -1,21 +1,18 @@
-const AWS = require("aws-sdk");
-let env = "prod";
-let config = {};
-try {
-  env = process.env.env;
-  if (env == "local") {
-    config['endpoint'] = `http://${process.env.LOCALSTACK_HOSTNAME}:4566`;
-  }
-} catch(errEnv) {
-  console.log("Unable to retrieve 'env'", err);
-}
-
-
-const docClient = new AWS.DynamoDB.DocumentClient(config);
-
 class Table {
-  constructor(config) {
+  constructor({config, AWS}) {
     this.config = config;
+
+    let env = "prod";
+    let awsConfig = {};
+    try {
+      env = process.env.env;
+      if (env == "local") {
+        awsConfig['endpoint'] = `http://${process.env.LOCALSTACK_HOSTNAME}:4566`;
+      }
+    } catch(errEnv) {
+      console.log("Unable to retrieve 'env'", err);
+    }
+    this.docClient = new AWS.DynamoDB.DocumentClient(awsConfig);
   }
 
   _buildBaseParams(hashKeyValue, sortKeyValue) {
@@ -66,7 +63,7 @@ class Table {
             ":pkv": hashKeyValue,
           },
         };
-        docClient.query(params, function (err, data) {
+        this.docClient.query(params, function (err, data) {
           if (err) {
             reject(err);
           } else {
@@ -95,7 +92,7 @@ class Table {
           sortKeyValue
         );
 
-        docClient.query(params, function (err, data) {
+        this.docClient.query(params, function (err, data) {
           if (err) {
             reject(err);
           } else {
@@ -112,7 +109,7 @@ class Table {
     return new Promise((resolve, reject) => {
       try {
         const params = this._buildBaseParams(hashKeyValue, sortKeyValue);
-        docClient.get(params, function (err, data) {
+        this.docClient.get(params, function (err, data) {
           if (err) {
             reject(err);
           } else {
@@ -138,7 +135,7 @@ class Table {
         params.Item[this.config.hashKey] = hashKeyValue;
         params.Item[this.config.sortKey] = sortKeyValue;
         params.ReturnValues = "ALL_OLD";
-        docClient.put(params, (err, data) => {
+        this.docClient.put(params, (err, data) => {
           if (err) {
             reject(err);
           } else {
@@ -173,7 +170,7 @@ class Table {
           params.ExpressionAttributeValues[valuePlaceholder] = fieldNewValue;
         });
         
-        docClient.update(params, (err, data) => {
+        this.docClient.update(params, (err, data) => {
           if (err) {
             reject(err);
           } else {
@@ -190,7 +187,7 @@ class Table {
     return new Promise((resolve, reject) => {
       try {
         const params = this._buildBaseParams(hashKeyValue, sortKeyValue);
-        docClient.delete(params, (err, data) => {
+        this.docClient.delete(params, (err, data) => {
           if (err) {
             reject(err);
           } else {
@@ -204,15 +201,13 @@ class Table {
   }
 }
 
-exports.Table = Table;
-
 const defaultMapper = {
   map : (dynamoDbItem) => {
     return dynamoDbItem;
   }
 }
 
-exports.tableConfigs  = {
+const tableConfigs  = {
   "loadtests" : {
     tableName: "loadtests",
     hashKey: "OrganisationId",
@@ -260,3 +255,6 @@ exports.tableConfigs  = {
     sortKey: "MetricName",
   },
 }
+
+exports.Table = Table;
+exports.tableConfigs = tableConfigs;

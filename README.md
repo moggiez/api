@@ -77,3 +77,11 @@ make build
 ```
 
 It will output the zipped code in the `dist` folder.
+
+# Testing
+
+## Install jest
+
+```bash
+npm install jest --global
+```
