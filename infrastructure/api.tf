@@ -169,8 +169,8 @@ module "metrics_lambda_api" {
     aws_iam_policy.dynamodb_access_organisations.arn,
     aws_iam_policy.dynamodb_access_loadtest_metrics.arn
   ]
-  authorizer = local.authorizer
-  environment    = local.environment
+  authorizer  = local.authorizer
+  environment = local.environment
 }
 
 module "metrics_lambda_api_proxy" {
