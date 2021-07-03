@@ -9,6 +9,10 @@ resource "aws_acm_certificate" "_" {
   lifecycle {
     create_before_destroy = true
   }
+
+  tags = {
+    Name = "API certificate"
+  }
 }
 
 resource "aws_route53_record" "cert_validation" {
