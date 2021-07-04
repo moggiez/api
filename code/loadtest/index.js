@@ -1,10 +1,12 @@
 "use strict";
 
-const config = require("./config");
+const AWS = require("aws-sdk");
+const db = require("moggies-db");
+
 const helpers = require("moggies-lambda-helpers");
 const auth = require("moggies-auth");
-const uuid = require("uuid");
-const handlers = require("./handlers");
+const config = require("./config");
+const { Handler } = require("./handler");
 
 exports.handler = function (event, context, callback) {
   const response = helpers.getResponseFn(callback);
@@ -14,32 +16,10 @@ exports.handler = function (event, context, callback) {
   }
 
   const user = auth.getUserFromEvent(event);
+  const request = helpers.getRequestFromEvent(event);
+  request.user = user;
 
-  const httpMethod = event.httpMethod;
-  const pathParameters = event.pathParameters;
-  const pathParams =
-    pathParameters != null && "proxy" in pathParameters && pathParameters.proxy
-      ? pathParameters.proxy.split("/")
-      : [];
-
-  try {
-    const organisationId = pathParams[0];
-    const loadtestId = pathParams.length > 1 ? pathParams[1] : "";
-    const payload = JSON.parse(event.body);
-    if (payload) {
-      payload["UserId"] = user.id;
-    }
-
-    if (httpMethod == "GET") {
-      handlers.get(organisationId, loadtestId, response);
-    } else if (httpMethod == "POST") {
-      const loadtestId = uuid.v4();
-      handlers.post(organisationId, loadtestId, payload, response);
-    } else {
-      response(403, "Not supported.", config.headers);
-    }
-  } catch (err) {
-    console.log(err);
-    response(500, err, config.headers);
-  }
+  const table = new db.Table({ config: db.tableConfigs.loadtests, AWS: AWS });
+  const handler = new Handler(table);
+  handler.handle(request, response);
 };
