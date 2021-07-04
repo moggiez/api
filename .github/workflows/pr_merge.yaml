@@ -55,9 +55,6 @@ jobs:
       - name: Build lambdas
         run: make build
 
-      - name: Run tests
-        run: make test
-
       # Build packages and generates an execution plan for Terraform
       - name: Preview deployment
         run: make preview
