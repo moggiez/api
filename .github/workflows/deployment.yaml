@@ -93,6 +93,12 @@ jobs:
       - name: Login to repo
         run: aws codeartifact login --tool npm --repository team-npm --domain moggies-io --domain-owner ${{ secrets.AWS_ACCOUNT_ID }}
 
+      - name: Build lambdas
+        run: make build
+
+      - name: Run tests
+        run: make test
+
       # Builds lambda packages and generates an execution plan for Terraform
       - name: Preview deployment
         run: make preview
