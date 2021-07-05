@@ -1,5 +1,5 @@
 class Table {
-  constructor({config, AWS}) {
+  constructor({ config, AWS }) {
     this.config = config;
 
     let env = "prod";
@@ -7,9 +7,11 @@ class Table {
     try {
       env = process.env.env;
       if (env == "local") {
-        awsConfig['endpoint'] = `http://${process.env.LOCALSTACK_HOSTNAME}:4566`;
+        awsConfig[
+          "endpoint"
+        ] = `http://${process.env.LOCALSTACK_HOSTNAME}:4566`;
       }
-    } catch(errEnv) {
+    } catch (errEnv) {
       console.log("Unable to retrieve 'env'", err);
     }
     this.docClient = new AWS.DynamoDB.DocumentClient(awsConfig);
@@ -41,9 +43,8 @@ class Table {
 
     if (sortKeyValue) {
       params.KeyConditionExpression += " and #skv = :skv";
-      params.ExpressionAttributeNames["#skv"] = this.config.indexes[
-        indexName
-      ].sortKey;
+      params.ExpressionAttributeNames["#skv"] =
+        this.config.indexes[indexName].sortKey;
       params.ExpressionAttributeValues[":skv"] = sortKeyValue;
     }
 
@@ -156,7 +157,7 @@ class Table {
         let params = this._buildBaseParams(hashKeyValue, sortKeyValue);
         params.UpdateExpression = `set UpdatedAt = :sfUpdatedAt,`;
         params.ExpressionAttributeValues = {
-          ':sfUpdatedAt': new Date().toISOString()
+          ":sfUpdatedAt": new Date().toISOString(),
         };
         params.ReturnValues = "ALL_NEW";
 
@@ -169,7 +170,7 @@ class Table {
           }`;
           params.ExpressionAttributeValues[valuePlaceholder] = fieldNewValue;
         });
-        
+
         this.docClient.update(params, (err, data) => {
           if (err) {
             reject(err);
@@ -202,13 +203,13 @@ class Table {
 }
 
 const defaultMapper = {
-  map : (dynamoDbItem) => {
+  map: (dynamoDbItem) => {
     return dynamoDbItem;
-  }
-}
+  },
+};
 
-const tableConfigs  = {
-  "loadtests" : {
+const tableConfigs = {
+  loadtests: {
     tableName: "loadtests",
     hashKey: "OrganisationId",
     sortKey: "LoadtestId",
@@ -227,12 +228,12 @@ const tableConfigs  = {
       },
     },
   },
-  "playbooks": {
+  playbooks: {
     tableName: "playbooks",
     hashKey: "OrganisationId",
-    sortKey: "PlaybookId"
+    sortKey: "PlaybookId",
   },
-  "organisations": {
+  organisations: {
     tableName: "organisations",
     hashKey: "OrganisationId",
     sortKey: "UserId",
@@ -243,18 +244,18 @@ const tableConfigs  = {
       },
     },
   },
-  "domains": {
+  domains: {
     tableName: "domains",
     hashKey: "OrganisationId",
     sortKey: "DomainName",
     mapper: defaultMapper,
   },
-  "loadtest_metrics": {
+  loadtest_metrics: {
     tableName: "loadtest_metrics",
     hashKey: "LoadtestId",
     sortKey: "MetricName",
   },
-}
+};
 
 exports.Table = Table;
 exports.tableConfigs = tableConfigs;

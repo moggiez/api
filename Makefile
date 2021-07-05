@@ -8,7 +8,16 @@ modules-cleanup:
 	cd infrastructure && rm -rf .terraform/modules
 
 build: build-cleanup
-	./scripts/package_all.sh 
+	./scripts/package_all.sh
+
+lint:
+	npx prettier --check **/*.js
+
+format:
+	npx prettier --write **/*.js
+
+test:
+	jest
 
 infra-init:
 	cd infrastructure && terraform init -force-copy -backend-config="bucket=moggies.io-terraform-state-backend" -backend-config="dynamodb_table=moggies.io-api-terraform_state" -backend-config="key=api-terraform.state" -backend-config="region=eu-west-1"
@@ -32,5 +41,3 @@ repo-publish:
 	./scripts/publish_npm_packages.sh
 npm-auth:
 	aws codeartifact login --tool npm --repository team-npm --domain moggies-io --domain-owner 989665778089
-test:
-	jest

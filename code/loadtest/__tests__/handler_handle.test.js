@@ -37,7 +37,7 @@ describe("Handler.handle", () => {
     expect(handler.get).toHaveBeenCalledWith(orgId, loadtestId, response);
   });
 
-  it("calls this.get when httpMethod is POST", () => {
+  it("calls this.post when httpMethod is POST", () => {
     const orgId = uuid.v4();
     const payload = {
       TestField: 1,
