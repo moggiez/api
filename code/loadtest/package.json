@@ -12,10 +12,13 @@
     "uuid": "^8.3.2"
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "lint": "prettier --check .",
+    "format": "prettier --write ."
   },
   "devDependencies": {
-    "jest": "^27.0.5"
+    "jest": "^27.0.5",
+    "prettier": "2.3.2"
   },
   "jest": {
     "testPathIgnorePatterns": [
