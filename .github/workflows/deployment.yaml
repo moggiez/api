@@ -14,23 +14,23 @@ jobs:
       run:
         shell: bash
 
-    # Checkout the repository to the GitHub Actions runner
-    - name: Checkout
-      uses: actions/checkout@v2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: "14"
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
 
-    - name: Build lambdas
-      run: make build
+      - name: Build lambdas
+        run: make build
 
-    - name: Lint code
-      run: make lint
+      - name: Lint code
+        run: make lint
 
-    - name: Run test
-      run: make test
+      - name: Run test
+        run: make test
 
   npm-packages:
     name: "Publishes npm packages to team NPM repostiroy"
