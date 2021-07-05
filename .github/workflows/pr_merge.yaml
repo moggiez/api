@@ -29,6 +29,9 @@ jobs:
       - name: Lint code
         run: make lint
 
+      - name: Install Jest
+        run: npm i -g jest
+
       - name: Run test
         run: make test
 
