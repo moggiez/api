@@ -18,3 +18,12 @@ describe("Table", () => {
     expect(mockedFunctions.get).toHaveBeenCalled();
   });
 });
+
+describe("Table.get_config", () => {
+  it("returns config", () => {
+    const mockConfig = {};
+    const { mockAWS, _ } = mockAWSLib();
+    const table = new Table({ config: mockConfig, AWS: mockAWS });
+    expect(table.getConfig()).toEqual(mockConfig);
+  });
+});
