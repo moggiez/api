@@ -14,4 +14,3 @@ describe("Handler.constructor", () => {
     expect(() => new Handler(table)).not.toThrow();
   });
 });
-make;

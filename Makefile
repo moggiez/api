@@ -17,7 +17,7 @@ format:
 	npx prettier --write **/*.js
 
 test:
-	jest --coverage
+	jest --coverage --collectCoverageFrom='code/**/*.js'
 
 infra-init:
 	cd infrastructure && terraform init -force-copy -backend-config="bucket=moggies.io-terraform-state-backend" -backend-config="dynamodb_table=moggies.io-api-terraform_state" -backend-config="key=api-terraform.state" -backend-config="region=eu-west-1"
