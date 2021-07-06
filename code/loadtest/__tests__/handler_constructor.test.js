@@ -10,7 +10,7 @@ describe("Handler.constructor", () => {
   });
 
   it("shouldn't raise excepttion when table is domains", () => {
-    const table = mockTable({ tableName: "domains" });
+    const table = mockTable({ tableName: "loadtests" });
     expect(() => new Handler(table)).not.toThrow();
   });
 });
