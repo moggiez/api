@@ -50,11 +50,6 @@ jobs:
       - name: Run test
         run: make test
 
-      - uses: artiomtr/jest-coverage-report-action@v2.0-rc.1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          #   threshold: 80 # optional parameter
-
   npm-packages:
     name: "Publishes npm packages to team NPM repostiroy"
     needs: lint_and_test
