@@ -124,19 +124,19 @@ jobs:
           aws-region: eu-west-1
 
       - name: Deploy domain_api
-        run: FUN_NAME=domain_api make update-lambda-fn
+        run: FUNC_NAME=domain_api make update-lambda-fn
 
       - name: Deploy loadtest_api
-        run: FUN_NAME=loadtest_api make update-lambda-fn
+        run: FUNC_NAME=loadtest_api make update-lambda-fn
 
       - name: Deploy metrics_api
-        run: FUN_NAME=metrics_api make update-lambda-fn
+        run: FUNC_NAME=metrics_api make update-lambda-fn
 
       - name: Deploy organisation_api
-        run: FUN_NAME=organisation_api make update-lambda-fn
+        run: FUNC_NAME=organisation_api make update-lambda-fn
 
       - name: Deploy playbook_api
-        run: FUN_NAME=playbook_api make update-lambda-fn
+        run: FUNC_NAME=playbook_api make update-lambda-fn
 
       - name: Deploy user_api
-        run: FUN_NAME=user_api make update-lambda-fn
+        run: FUNC_NAME=user_api make update-lambda-fn
