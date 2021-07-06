@@ -9,7 +9,7 @@
     "moggies-auth": "^0.1.1",
     "moggies-db": "^0.1.5",
     "moggies-lambda-helpers": "^0.1.0",
-    "moggies-metrics": "^0.1.0",
+    "moggies-metrics": "^0.1.2",
     "uuid": "^8.3.2"
   },
   "scripts": {

@@ -119,7 +119,7 @@ class Handler {
     } else {
       const orgId = orgData.Items[0].OrganisationId;
       const loadtestData = await this.loadtests.get(orgId, loadtestId);
-      return loadtestData.Item;
+      return "Item" in loadtestData ? loadtestData.Item : null;
     }
   };
 
