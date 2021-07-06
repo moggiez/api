@@ -20,6 +20,7 @@ exports.handler = function (event, context, callback) {
   request.user = user;
 
   const table = new db.Table({ config: db.tableConfigs.domains, AWS: AWS });
+
   const handler = new Handler(table);
   handler.handle(request, response);
 };

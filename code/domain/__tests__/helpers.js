@@ -148,10 +148,13 @@ const buildLambdaRequest = (httpMethod, routeBase, path, payload) => {
   return result;
 };
 
-const mockTable = () => {
-  const mockConfig = {};
+const mockTable = (config) => {
+  const mockConfig = config || { tableName: "domains" };
   const { mockAWS, _ } = mockAWSLib();
-  return new Table({ config: mockConfig, AWS: mockAWS });
+  const table = new Table({ config: mockConfig, AWS: mockAWS });
+
+  table.getConfig.mockReturnValue(mockConfig);
+  return table;
 };
 
 const getPromiseWithReturnValue = (returnValue) => {
