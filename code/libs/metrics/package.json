@@ -1,11 +1,8 @@
 {
   "name": "moggies-metrics",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Helper functions for CloudWatch metrics for moggies.io",
   "main": "metrics.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/moggiez/api.git"
@@ -20,5 +17,19 @@
   "bugs": {
     "url": "https://github.com/moggiez/api/issues"
   },
-  "homepage": "https://github.com/moggiez/api#readme"
+  "homepage": "https://github.com/moggiez/api#readme",
+  "devDependencies": {
+    "jest": "^27.0.5",
+    "prettier": "2.3.2"
+  },
+  "scripts": {
+    "test": "jest",
+    "lint": "prettier --check .",
+    "format": "prettier --write ."
+  },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "__tests__/helpers.js"
+    ]
+  }
 }
