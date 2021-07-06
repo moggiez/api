@@ -57,6 +57,7 @@ jobs:
 
   npm-packages:
     name: "Publishes npm packages to team NPM repostiroy"
+    needs: lint_and_test
     runs-on: ubuntu-latest
     environment: production
 
@@ -88,6 +89,7 @@ jobs:
 
   deploy_lambdas:
     name: "Deploys lambdas to AWS"
+    needs: lint_and_test
     runs-on: ubuntu-latest
     environment: production
     env:
