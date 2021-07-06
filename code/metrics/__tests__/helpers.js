@@ -1,6 +1,8 @@
 const uuid = require("uuid");
 const { Table } = require("moggies-db");
+const { Metrics } = require("moggies-metrics");
 jest.mock("moggies-db");
+jest.mock("moggies-metrics");
 
 const mockAWSLib = () => {
   const mockGet = jest.fn();
@@ -149,12 +151,19 @@ const buildLambdaRequest = (httpMethod, routeBase, path, payload) => {
 };
 
 const mockTable = (config) => {
-  const mockConfig = config || { tableName: "domains" };
+  const mockConfig = config || {};
   const { mockAWS, _ } = mockAWSLib();
-  const table = new Table({ config: mockConfig, AWS: mockAWS });
 
+  const table = new Table({ config: mockConfig, AWS: mockAWS });
   table.getConfig.mockReturnValue(mockConfig);
   return table;
+};
+
+const mockMetrics = () => {
+  const cw = {
+    getMetricData: (params, callback) => callback(null, "Success"),
+  };
+  return new Metrics(cw);
 };
 
 const getPromiseWithReturnValue = (returnValue) => {
@@ -166,6 +175,7 @@ const getPromiseWithReject = (err) => {
 };
 
 exports.mockAWSLib = mockAWSLib;
+exports.mockMetrics = mockMetrics;
 exports.mockTable = mockTable;
 exports.getPromiseWithReturnValue = getPromiseWithReturnValue;
 exports.getPromiseWithReject = getPromiseWithReject;

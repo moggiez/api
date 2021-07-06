@@ -24,12 +24,12 @@ exports.getRequestFromEvent = (event) => {
 
   const getPathParamAtIndex = (index, defaultValue) => {
     return pathParams.length > index ? pathParams[index] : defaultValue;
-  }
+  };
 
   return {
     httpMethod: httpMethod,
     body: JSON.parse(event.body),
     pathParameters: pathParams,
-    getPathParamAtIndex: getPathParamAtIndex
-  }
-}
+    getPathParamAtIndex: getPathParamAtIndex,
+  };
+};
