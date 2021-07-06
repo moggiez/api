@@ -5,7 +5,7 @@ describe("Handler.constructor", () => {
   it("should raise exception when table is not domains", () => {
     const table = mockTable({ tableName: "unknown" });
     expect(() => new Handler(table)).toThrow(
-      "Constructor expects 'domains' table passed. The passed table name does not match 'domains'."
+      "Constructor expects 'loadtests' table passed. The passed table name does not match 'loadtests'."
     );
   });
 
