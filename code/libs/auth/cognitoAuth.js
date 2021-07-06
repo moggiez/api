@@ -5,8 +5,8 @@ const getFakeAuth = () => {
     email: "test@moggies.io",
     clientId: "local-env",
     verified: true,
-  }
-}
+  };
+};
 
 const getUserFromClaims = (event) => {
   const claims = event.requestContext.authorizer.claims;
@@ -17,16 +17,16 @@ const getUserFromClaims = (event) => {
     clientId: claims.aud,
     verified: claims.email_verified,
   };
-}
+};
 
 exports.getUserFromEvent = (event) => {
   let env = "prod";
   try {
     env = process.env.env;
-  } catch(errEnv) {
+  } catch (errEnv) {
     console.log("Unable to retrieve 'env'", err);
   }
-  
+
   try {
     return env == "local" ? getFakeAuth() : getUserFromClaims(event);
   } catch (err) {

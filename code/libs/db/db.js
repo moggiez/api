@@ -51,6 +51,10 @@ class Table {
     return params;
   }
 
+  getConfig() {
+    return this.config;
+  }
+
   getByPartitionKey(hashKeyValue) {
     return new Promise((resolve, reject) => {
       try {

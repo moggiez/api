@@ -1,6 +1,6 @@
 {
   "name": "moggies-db",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": false,
   "keywords": [
     "moggies.io",
@@ -8,8 +8,14 @@
     "moggies"
   ],
   "dependencies": {},
+  "devDependencies": {
+    "jest": "^27.0.5",
+    "prettier": "2.3.2"
+  },
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "lint": "prettier --check .",
+    "format": "prettier --write ."
   },
   "description": "Database utilities for moggies.io",
   "main": "db.js",

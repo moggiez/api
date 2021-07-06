@@ -10,5 +10,18 @@
     "moggies-db": "^0.1.3",
     "moggies-lambda-helpers": "^0.1.0"
   },
-  "scripts": {}
+  "devDependencies": {
+    "jest": "^27.0.5",
+    "prettier": "2.3.2"
+  },
+  "scripts": {
+    "test": "jest",
+    "lint": "prettier --check .",
+    "format": "prettier --write ."
+  },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "__tests__/helpers.js"
+    ]
+  }
 }

@@ -2,6 +2,12 @@
 
 class Handler {
   constructor(table) {
+    const expectedTableName = "domains";
+    if (table && table.getConfig().tableName != expectedTableName) {
+      throw new Error(
+        `Constructor expects '${expectedTableName}' table passed. The passed table name does not match '${expectedTableName}'.`
+      );
+    }
     this.table = table;
   }
 
