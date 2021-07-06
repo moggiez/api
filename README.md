@@ -52,8 +52,8 @@ make terraform-backend
 
 ### Deployment from your local machine
 
-- Run `make preview` to preview the deployment.
-- Run `make deploy` to do the actual deployment
+- Run `make infra-preview` to preview the deployment.
+- Run `make infra-deploy` to do the actual deployment
 
 ### Automatic deployment
 

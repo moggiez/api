@@ -112,7 +112,7 @@ jobs:
 
       # Build packages and generates an execution plan for Terraform
       - name: Preview deployment
-        run: make preview
+        run: make infra-preview
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
