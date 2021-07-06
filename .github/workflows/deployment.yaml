@@ -80,3 +80,43 @@ jobs:
 
       - name: Publish npm packages
         run: make repo-publish
+
+  deploy_lambdas:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: "14"
+
+    - name: Login to NPM
+      run: make npm-auth
+
+    - name: Build lambdas
+      run: make build
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+        aws-region: eu-west-1
+
+    - name: Deploy domain_api
+      run: FUN_NAME=domain_api make update-lambda-fn
+
+    - name: Deploy loadtest_api
+      run: FUN_NAME=loadtest_api make update-lambda-fn
+
+    - name: Deploy metrics_api
+      run: FUN_NAME=metrics_api make update-lambda-fn
+
+    - name: Deploy organisation_api
+      run: FUN_NAME=organisation_api make update-lambda-fn
+
+    - name: Deploy playbook_api
+      run: FUN_NAME=playbook_api make update-lambda-fn
+
+    - name: Deploy user_api
+      run: FUN_NAME=user_api make update-lambda-fn
