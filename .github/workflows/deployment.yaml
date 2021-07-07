@@ -31,8 +31,8 @@ jobs:
       - name: Login to NPM
         run: make npm-auth
 
-      - name: Build lambdas
-        run: make build
+      - name: Build lambdas dev
+        run: make build-dev
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1

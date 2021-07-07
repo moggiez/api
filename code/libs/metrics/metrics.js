@@ -51,7 +51,7 @@ class Metrics {
     };
   }
 
-  async getMetricsData(params) {
+  getMetricsData(params) {
     return new Promise((resolve, reject) => {
       console.log(JSON.stringify(params));
       this.CloudWatch.getMetricData(params, (err, data) => {

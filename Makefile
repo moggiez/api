@@ -11,6 +11,9 @@ modules-cleanup:
 build: build-cleanup
 	./scripts/package_all.sh
 
+build-dev: build-cleanup
+	ENV=dev ./scripts/package_all.sh
+
 lint:
 	npx prettier --check **/*.js
 
