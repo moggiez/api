@@ -1,0 +1,5 @@
+{
+    "scripts": {
+        "test": "jest --coverage --collectCoverageFrom='code/**/*.js' --silent --ci --coverageReporters=\"text\" --coverageReporters=\"text-summary\""
+    }
+}

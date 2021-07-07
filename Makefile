@@ -21,7 +21,7 @@ format:
 	npx prettier --write **/*.js
 
 test:
-	jest --coverage --collectCoverageFrom='code/**/*.js'
+	npm run test
 
 update-lambda-fn:
 	aws lambda update-function-code --function-name ${FUNC_NAME} --zip-file fileb://$(shell pwd)/dist/${FUNC_NAME}.zip --publish | jq .FunctionArn
