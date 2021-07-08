@@ -41,6 +41,9 @@ jobs:
       - name: Build lambdas dev
         run: make build-dev
 
+      - name: Install NPM modules
+        run: npm i
+
       - name: Lint code
         run: make lint
 
