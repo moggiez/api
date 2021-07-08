@@ -15,10 +15,10 @@ build-dev: build-cleanup
 	ENV=dev ./scripts/package_all.sh
 
 lint:
-	npx prettier --check **/*.js
+	npm run lint
 
 format:
-	npx prettier --write **/*.js
+	npm run format
 
 test:
 	npm run test
