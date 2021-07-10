@@ -26,6 +26,8 @@ class Handler {
         await this.get(organisationId, loadtestId, response);
       } else if (request.httpMethod == "POST") {
         await this.post(organisationId, payload, response);
+      } else if (request.httpMethod == "DELETE") {
+        await this.delete(organisationId, loadtestId, response);
       } else {
         response(403, "Not supported.");
       }
@@ -66,6 +68,15 @@ class Handler {
       response(200, data);
     } catch (err) {
       console.log(err);
+      response(500, err);
+    }
+  };
+
+  delete = async (organisationId, loadtestId, response) => {
+    try {
+      const data = await this.table.delete(organisationId, loadtestId);
+      response(200, data);
+    } catch (err) {
       response(500, err);
     }
   };

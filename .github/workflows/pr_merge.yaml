@@ -41,6 +41,9 @@ jobs:
       - name: Build lambdas dev
         run: make build-dev
 
+      - name: Install NPM modules
+        run: npm i
+
       - name: Lint code
         run: make lint
 
@@ -50,9 +53,11 @@ jobs:
       - name: Run test
         run: make test
 
-      - uses: artiomtr/jest-coverage-report-action@v2.0-rc.1
+      - name: Run coverage report
+        uses: artiomtr/jest-coverage-report-action@v2.0-rc.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          test-script: npm run test
           #   threshold: 80 # optional parameter
 
   terraform:

@@ -15,13 +15,13 @@ build-dev: build-cleanup
 	ENV=dev ./scripts/package_all.sh
 
 lint:
-	npx prettier --check **/*.js
+	npm run lint
 
 format:
-	npx prettier --write **/*.js
+	npm run format
 
 test:
-	jest --coverage --collectCoverageFrom='code/**/*.js'
+	npm run test
 
 update-lambda-fn:
 	aws lambda update-function-code --function-name ${FUNC_NAME} --zip-file fileb://$(shell pwd)/dist/${FUNC_NAME}.zip --publish | jq .FunctionArn

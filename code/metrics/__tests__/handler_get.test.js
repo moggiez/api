@@ -175,11 +175,6 @@ describe("Handler.get", () => {
     const user = { id: uuid.v4() };
     const loadtestId = uuid.v4();
     const loadtestItem = { LoadtestId: loadtestId };
-    const mockParams = { params: "yes" };
-    const metricsDataItem = {
-      MetricsData: { someField: uuid.v4() },
-    };
-    const expectedError = new Error("My error");
     organisations.getBySecondaryIndex.mockReturnValue(
       getPromiseWithReturnValue({
         Items: [{ OrganisationId: orgId, UserId: user.id }],
