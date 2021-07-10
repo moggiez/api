@@ -10,7 +10,7 @@ const mockAWSLib = () => {
     query = mockQuery;
     put = mockPut;
     update = mockUpdate;
-    mockDelete = mockDelete;
+    delete = mockDelete;
   };
 
   const mockAWS = {
@@ -19,7 +19,16 @@ const mockAWSLib = () => {
     },
   };
 
-  return { mockAWS, mockedFunctions: { get: mockGet } };
+  return {
+    mockAWS,
+    mockedFunctions: {
+      get: mockGet,
+      query: mockQuery,
+      put: mockPut,
+      update: mockUpdate,
+      delete: mockDelete,
+    },
+  };
 };
 
 exports.mockAWSLib = mockAWSLib;
