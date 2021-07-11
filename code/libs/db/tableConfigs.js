@@ -32,7 +32,7 @@ exports.tableConfigs = {
   playbook_versions: {
     tableName: "playbook_versions",
     hashKey: "PlaybookId",
-    sortKey: "VersionId",
+    sortKey: "Version",
     indexes: {
       OrganisationPlaybooks: {
         hashKey: "OrganisationId",
