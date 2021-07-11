@@ -1,3 +1,4 @@
+const versionRegex = /v[0-9]+/g;
 class Table {
   constructor({ config, AWS }) {
     this.config = config;
@@ -193,6 +194,12 @@ class Table {
   }
 
   create(hashKeyValue, sortKeyValue, recordAttributesObject) {
+    const isVersionned = this.config.tableName.endsWith("_versions");
+    if (isVersionned && !sortKeyValue.match(versionRegex)) {
+      throw new Error(
+        `Sort key '${sortKeyValue}' doesn't match expected pattern ${versionRegex}`
+      );
+    }
     return new Promise((resolve, reject) => {
       try {
         let params = this._buildBaseParams(hashKeyValue, sortKeyValue);
@@ -200,8 +207,14 @@ class Table {
 
         const dateStr = new Date().toISOString();
         params.Item = recordAttributesObject;
-        params.Item["CreatedAt"] = dateStr;
         params.Item["UpdatedAt"] = dateStr;
+
+        if (isVersionned) {
+          params.Item["Latest"] = 0;
+        } else {
+          params.Item["CreatedAt"] = dateStr;
+        }
+
         params.Item[this.config.hashKey] = hashKeyValue;
         params.Item[this.config.sortKey] = sortKeyValue;
         params.ReturnValues = "ALL_OLD";
@@ -219,22 +232,38 @@ class Table {
   }
 
   update(hashKeyValue, sortKeyValue, fieldUpdatesDict) {
+    const isVersionned = this.config.tableName.endsWith("_versions");
+    if (isVersionned && sortKeyValue != "v0") {
+      throw new Error(
+        "You can only update records with version 'v0' when table is using versionning."
+      );
+    }
     return new Promise((resolve, reject) => {
       try {
         delete fieldUpdatesDict["CreatedAt"];
         delete fieldUpdatesDict["UpdatedAt"];
         let params = this._buildBaseParams(hashKeyValue, sortKeyValue);
-        params.UpdateExpression = `set UpdatedAt = :sfUpdatedAt,`;
+        params.UpdateExpression = `SET ${
+          isVersionned
+            ? "Latest = if_not_exists(Latest, :defaultval) + :incrval,"
+            : ""
+        } UpdatedAt = :sfUpdatedAt,`;
         params.ExpressionAttributeValues = {
           ":sfUpdatedAt": new Date().toISOString(),
         };
+
+        if (isVersionned) {
+          params.ExpressionAttributeValues[":defaultval"] = 0;
+          params.ExpressionAttributeValues[":incrval"] = 1;
+        }
+
         params.ReturnValues = "ALL_NEW";
 
         Object.entries(fieldUpdatesDict).forEach((element, index, array) => {
           const fieldName = element[0];
           const fieldNewValue = element[1];
           const valuePlaceholder = `:f${index}`;
-          params.UpdateExpression += `${fieldName} = ${valuePlaceholder}${
+          params.UpdateExpression += ` ${fieldName} = ${valuePlaceholder}${
             index + 1 < array.length ? "," : ""
           }`;
           params.ExpressionAttributeValues[valuePlaceholder] = fieldNewValue;
@@ -271,60 +300,6 @@ class Table {
   }
 }
 
-const defaultMapper = {
-  map: (dynamoDbItem) => {
-    return dynamoDbItem;
-  },
-};
-
-const tableConfigs = {
-  loadtests: {
-    tableName: "loadtests",
-    hashKey: "OrganisationId",
-    sortKey: "LoadtestId",
-    indexes: {
-      PlaybookLoadtestIndex: {
-        hashKey: "PlaybookId",
-        sortKey: "LoadtestId",
-      },
-      UsersLoadtestsIndex: {
-        hashKey: "UserId",
-        sortKey: "LoadtestId",
-      },
-      CreatedAtHourIndex: {
-        hashKey: "CreatedAtHour",
-        sortKey: "MetricsSavedDate",
-      },
-    },
-  },
-  playbooks: {
-    tableName: "playbooks",
-    hashKey: "OrganisationId",
-    sortKey: "PlaybookId",
-  },
-  organisations: {
-    tableName: "organisations",
-    hashKey: "OrganisationId",
-    sortKey: "UserId",
-    indexes: {
-      UserOrganisations: {
-        hashKey: "UserId",
-        sortKey: "OrganisationId",
-      },
-    },
-  },
-  domains: {
-    tableName: "domains",
-    hashKey: "OrganisationId",
-    sortKey: "DomainName",
-    mapper: defaultMapper,
-  },
-  loadtest_metrics: {
-    tableName: "loadtest_metrics",
-    hashKey: "LoadtestId",
-    sortKey: "MetricName",
-  },
-};
-
 exports.Table = Table;
+const { tableConfigs } = require("./tableConfigs");
 exports.tableConfigs = tableConfigs;

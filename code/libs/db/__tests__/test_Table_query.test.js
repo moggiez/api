@@ -2,7 +2,7 @@ const { Table, tableConfigs } = require("../db");
 const { mockAWSLib } = require("./helpers");
 
 describe("Table.query", () => {
-  it("build query when key condition and filter provided", () => {
+  it("builds params when key condition and filter provided", () => {
     const config = tableConfigs.loadtests;
     const { mockAWS, mockedFunctions } = mockAWSLib();
     const table = new Table({ config: config, AWS: mockAWS });
