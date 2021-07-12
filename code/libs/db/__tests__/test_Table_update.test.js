@@ -1,5 +1,6 @@
 const { Table, tableConfigs } = require("../db");
 const { mockAWSLib } = require("./helpers");
+const uuid = require("uuid");
 
 describe("Table.update", () => {
   it("builds correct params when not versionned", () => {
@@ -122,5 +123,67 @@ describe("Table.update", () => {
     expect(() =>
       table.update({ hashKey: "hashKeyValue", sortKey: "v0", updatedFields })
     ).not.toThrow();
+  });
+
+  it("calls resolve when docClient.update is successful", async () => {
+    const config = tableConfigs.playbook_versions;
+    const { mockAWS, mockedFunctions } = mockAWSLib();
+    const table = new Table({ config: config, AWS: mockAWS });
+
+    const responseData = { what: "Successful data" };
+    mockedFunctions.update.mockImplementation((params, callback) =>
+      callback(null, responseData)
+    );
+
+    const data = await table.update({
+      hashKey: uuid.v4(),
+      sortKey: "v0",
+      updatedFields: {},
+    });
+    expect(data).toEqual(responseData);
+  });
+
+  it("calls reject when docClient.update fails", async () => {
+    const config = tableConfigs.playbook_versions;
+    const { mockAWS, mockedFunctions } = mockAWSLib();
+    const table = new Table({ config: config, AWS: mockAWS });
+
+    const expectedError = "This is my error";
+    mockedFunctions.update.mockImplementation((params, callback) =>
+      callback(expectedError, null)
+    );
+
+    try {
+      await table.update({
+        hashKey: uuid.v4(),
+        sortKey: "v0",
+        updatedFields: {},
+      });
+      fail("Promise.reject wasn't called");
+    } catch (err) {
+      expect(err).toEqual(expectedError);
+    }
+  });
+
+  it("calls reject when exception thrown", async () => {
+    const config = tableConfigs.playbook_versions;
+    const { mockAWS, mockedFunctions } = mockAWSLib();
+    const table = new Table({ config: config, AWS: mockAWS });
+
+    const expectedError = new Error("This is my error");
+    mockedFunctions.update.mockImplementation((params, callback) => {
+      throw expectedError;
+    });
+
+    try {
+      await table.update({
+        hashKey: uuid.v4(),
+        sortKey: "v0",
+        updatedFields: {},
+      });
+      fail("Promise.reject wasn't called");
+    } catch (err) {
+      expect(err).toEqual(expectedError);
+    }
   });
 });
