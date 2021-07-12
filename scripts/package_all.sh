@@ -10,6 +10,7 @@ LOCAL_ENV=prod
    LOCAL_ENV=prod
 
 APIS=("user" "organisation" "domain" "playbook" "loadtest" "metrics")
+PACKAGES=("db" "auth" "lambda_helpers" "metrics")
 
 for api in "${APIS[@]}"
 do
@@ -18,3 +19,10 @@ do
 	ENV=$LOCAL_ENV $PWD/scripts/build_and_package_api.sh $CODE_DIR/$api $DIST_DIR ${api}_api.zip
     echo ""
 done
+
+for pkg in "${PACKAGES[@]}"
+do
+    echo "Building package '$pkg'..."
+    rm -r $CODE_DIR/libs/$pkg/node_modules
+	ENV=$LOCAL_ENV $PWD/scripts/build_and_package_api.sh $CODE_DIR/libs/$pkg $DIST_DIR ${pkg}_pkg.zip
+done 
