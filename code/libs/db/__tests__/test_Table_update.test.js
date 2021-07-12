@@ -7,12 +7,12 @@ describe("Table.update", () => {
     const { mockAWS, mockedFunctions } = mockAWSLib();
     const table = new Table({ config: config, AWS: mockAWS });
 
-    const fieldUpdatesDict = {
+    const updatedFields = {
       test1: "abc",
       test2: 1,
     };
 
-    table.update("hashKeyValue", "v0", fieldUpdatesDict);
+    table.update({ hashKey: "hashKeyValue", sortKey: "v0", updatedFields });
 
     const expectedResult = {
       TableName: "loadtests",
@@ -23,8 +23,8 @@ describe("Table.update", () => {
     expectedResult.Key[config.sortKey] = "v0";
     expectedResult.UpdateExpression = `SET  UpdatedAt = :sfUpdatedAt, test1 = :f0, test2 = :f1`;
     expectedResult.ExpressionAttributeValues = {
-      ":f0": fieldUpdatesDict.test1,
-      ":f1": fieldUpdatesDict.test2,
+      ":f0": updatedFields.test1,
+      ":f1": updatedFields.test2,
     };
     const expectedUpdatedAt = new Date().toISOString();
 
@@ -51,12 +51,12 @@ describe("Table.update", () => {
     const { mockAWS, mockedFunctions } = mockAWSLib();
     const table = new Table({ config: config, AWS: mockAWS });
 
-    const fieldUpdatesDict = {
+    const updatedFields = {
       test1: "abc",
       test2: 1,
     };
 
-    table.update("hashKeyValue", "v0", fieldUpdatesDict);
+    table.update({ hashKey: "hashKeyValue", sortKey: "v0", updatedFields });
 
     const expectedResult = {
       TableName: "playbook_versions",
@@ -69,8 +69,8 @@ describe("Table.update", () => {
     expectedResult.ExpressionAttributeValues = {
       ":defaultval": 0,
       ":incrval": 1,
-      ":f0": fieldUpdatesDict.test1,
-      ":f1": fieldUpdatesDict.test2,
+      ":f0": updatedFields.test1,
+      ":f1": updatedFields.test2,
     };
     const expectedUpdatedAt = new Date().toISOString();
 
@@ -97,12 +97,14 @@ describe("Table.update", () => {
     const { mockAWS, mockedFunctions } = mockAWSLib();
     const table = new Table({ config: config, AWS: mockAWS });
 
-    const fieldUpdatesDict = {
+    const updatedFields = {
       test1: "abc",
       test2: 1,
     };
 
-    expect(() => table.update("hashKeyValue", "v1", fieldUpdatesDict)).toThrow(
+    expect(() =>
+      table.update({ hashKey: "hashKeyValue", sortKey: "v1", updatedFields })
+    ).toThrow(
       "You can only update records with version 'v0' when table is using versionning."
     );
   });
@@ -112,13 +114,13 @@ describe("Table.update", () => {
     const { mockAWS, mockedFunctions } = mockAWSLib();
     const table = new Table({ config: config, AWS: mockAWS });
 
-    const fieldUpdatesDict = {
+    const updatedFields = {
       test1: "abc",
       test2: 1,
     };
 
     expect(() =>
-      table.update("hashKeyValue", "v0", fieldUpdatesDict)
+      table.update({ hashKey: "hashKeyValue", sortKey: "v0", updatedFields })
     ).not.toThrow();
   });
 });

@@ -12,7 +12,7 @@ describe("Table.create", () => {
       test2: 1,
     };
 
-    table.create("hashKeyValue", "sortKeyValue", record);
+    table.create({ hashKey: "hashKeyValue", sortKey: "sortKeyValue", record });
 
     const expectedResult = {
       TableName: "loadtests",
@@ -52,7 +52,7 @@ describe("Table.create", () => {
     };
     const sortKey = "v1";
 
-    table.create("hashKeyValue", sortKey, record);
+    table.create({ hashKey: "hashKeyValue", sortKey, record });
 
     const expectedResult = {
       TableName: "playbook_versions",
@@ -90,7 +90,9 @@ describe("Table.create", () => {
     };
     const sortKey = "vA";
 
-    expect(() => table.create("hashKeyValue", sortKey, record)).toThrow(
+    expect(() =>
+      table.create({ hashKey: "hashKeyValue", sortKey, record })
+    ).toThrow(
       `Sort key '${sortKey}' doesn't match expected pattern /v[0-9]+/g`
     );
   });
@@ -106,6 +108,8 @@ describe("Table.create", () => {
     };
     const sortKey = "v999";
 
-    expect(() => table.create("hashKeyValue", sortKey, record)).not.toThrow();
+    expect(() =>
+      table.create({ hashKey: "hashKeyValue", sortKey, record })
+    ).not.toThrow();
   });
 });

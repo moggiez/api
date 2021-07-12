@@ -18,13 +18,13 @@ class Table {
     this.docClient = new AWS.DynamoDB.DocumentClient(awsConfig);
   }
 
-  _buildBaseParams(hashKeyValue, sortKeyValue) {
+  _buildBaseParams(hashKey, sortKey) {
     let params = {
       TableName: this.config.tableName,
       Key: {},
     };
-    params.Key[this.config.hashKey] = hashKeyValue;
-    params.Key[this.config.sortKey] = sortKeyValue;
+    params.Key[this.config.hashKey] = hashKey;
+    params.Key[this.config.sortKey] = sortKey;
 
     return params;
   }
@@ -32,8 +32,8 @@ class Table {
   /**
    *
    * @param {*} indexName Secondary index name
-   * @param {*} hashKeyValue Value of the hash key
-   * @param {*} sortKeyValue Value of the sort key
+   * @param {*} hashKey Value of the hash key
+   * @param {*} sortKey Value of the sort key
    * @param {*} filter Filter object with 2 properties:
    *  'expression' which should be a filter expression
    *  'attributes' which should be an object where each property is a value in the filter expression
@@ -46,13 +46,13 @@ class Table {
    *  }
    * @returns
    */
-  _buildQueryParams(indexName, hashKeyValue, sortKeyValue, filter) {
+  _buildQueryParams(indexName, hashKey, sortKey, filter) {
     const params = {
       TableName: this.config.tableName,
       KeyConditionExpression: "#pk = :pkv",
       ExpressionAttributeNames: {},
       ExpressionAttributeValues: {
-        ":pkv": hashKeyValue,
+        ":pkv": hashKey,
       },
     };
 
@@ -61,19 +61,19 @@ class Table {
       params.ExpressionAttributeNames["#pk"] =
         this.config.indexes[indexName].hashKey;
 
-      if (sortKeyValue) {
+      if (sortKey) {
         params.KeyConditionExpression += " and #skv = :skv";
         params.ExpressionAttributeNames["#skv"] =
           this.config.indexes[indexName].sortKey;
-        params.ExpressionAttributeValues[":skv"] = sortKeyValue;
+        params.ExpressionAttributeValues[":skv"] = sortKey;
       }
     } else {
       params.ExpressionAttributeNames["#pk"] = this.config.hashKey;
 
-      if (sortKeyValue) {
+      if (sortKey) {
         params.KeyConditionExpression += " and #skv = :skv";
         params.ExpressionAttributeNames["#skv"] = this.config.sortKey;
-        params.ExpressionAttributeValues[":skv"] = sortKeyValue;
+        params.ExpressionAttributeValues[":skv"] = sortKey;
       }
     }
 
@@ -91,65 +91,10 @@ class Table {
     return this.config;
   }
 
-  getByPartitionKey(hashKeyValue) {
+  get({ hashKey, sortKey }) {
     return new Promise((resolve, reject) => {
       try {
-        const params = {
-          TableName: this.config.tableName,
-          KeyConditionExpression: "#pk = :pkv",
-          ExpressionAttributeNames: {
-            "#pk": this.config.hashKey,
-          },
-          ExpressionAttributeValues: {
-            ":pkv": hashKeyValue,
-          },
-        };
-        this.docClient.query(params, function (err, data) {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(data);
-          }
-        });
-      } catch (exc) {
-        reject(exc);
-      }
-    });
-  }
-
-  getBySecondaryIndex(indexName, hashKeyValue, sortKeyValue) {
-    return new Promise((resolve, reject) => {
-      try {
-        if (
-          !("indexes" in this.config) ||
-          !(indexName in this.config.indexes)
-        ) {
-          reject("Secondary index not found.");
-        }
-
-        const params = this._buildQueryParams(
-          indexName,
-          hashKeyValue,
-          sortKeyValue
-        );
-
-        this.docClient.query(params, function (err, data) {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(data);
-          }
-        });
-      } catch (exc) {
-        reject(exc);
-      }
-    });
-  }
-
-  get(hashKeyValue, sortKeyValue) {
-    return new Promise((resolve, reject) => {
-      try {
-        const params = this._buildBaseParams(hashKeyValue, sortKeyValue);
+        const params = this._buildBaseParams(hashKey, sortKey);
         this.docClient.get(params, function (err, data) {
           if (err) {
             reject(err);
@@ -164,19 +109,19 @@ class Table {
   }
 
   /**
-   *
-   * @param {*} hashKeyValue Hash key of the table
-   * @param {*} sortKeyValue Sort key of the table
+   * Queries for items
+   * @param {*} hashKey Hash key of the table
+   * @param {*} sortKey Sort key of the table
    * @param {*} filter Filter object. Should contain 'expression' and 'attributes' properties.
    * @returns A promise which should resolve with data fetched by using the argument provided or an error
    */
-  query(hashKeyValue, sortKeyValue, filter) {
+  query({ hashKey, sortKey, indexName, filter }) {
     return new Promise((resolve, reject) => {
       try {
         const params = this._buildQueryParams(
-          null,
-          hashKeyValue,
-          sortKeyValue,
+          indexName,
+          hashKey,
+          sortKey,
           filter
         );
 
@@ -193,20 +138,20 @@ class Table {
     });
   }
 
-  create(hashKeyValue, sortKeyValue, recordAttributesObject) {
+  create({ hashKey, sortKey, record }) {
     const isVersionned = this.config.tableName.endsWith("_versions");
-    if (isVersionned && !sortKeyValue.match(versionRegex)) {
+    if (isVersionned && !sortKey.match(versionRegex)) {
       throw new Error(
-        `Sort key '${sortKeyValue}' doesn't match expected pattern ${versionRegex}`
+        `Sort key '${sortKey}' doesn't match expected pattern ${versionRegex}`
       );
     }
     return new Promise((resolve, reject) => {
       try {
-        let params = this._buildBaseParams(hashKeyValue, sortKeyValue);
+        let params = this._buildBaseParams(hashKey, sortKey);
         delete params.Key;
 
         const dateStr = new Date().toISOString();
-        params.Item = recordAttributesObject;
+        params.Item = record;
         params.Item["UpdatedAt"] = dateStr;
 
         if (isVersionned) {
@@ -215,8 +160,8 @@ class Table {
           params.Item["CreatedAt"] = dateStr;
         }
 
-        params.Item[this.config.hashKey] = hashKeyValue;
-        params.Item[this.config.sortKey] = sortKeyValue;
+        params.Item[this.config.hashKey] = hashKey;
+        params.Item[this.config.sortKey] = sortKey;
         params.ReturnValues = "ALL_OLD";
         this.docClient.put(params, (err, data) => {
           if (err) {
@@ -231,18 +176,18 @@ class Table {
     });
   }
 
-  update(hashKeyValue, sortKeyValue, fieldUpdatesDict) {
+  update({ hashKey, sortKey, updatedFields }) {
     const isVersionned = this.config.tableName.endsWith("_versions");
-    if (isVersionned && sortKeyValue != "v0") {
+    if (isVersionned && sortKey != "v0") {
       throw new Error(
         "You can only update records with version 'v0' when table is using versionning."
       );
     }
     return new Promise((resolve, reject) => {
       try {
-        delete fieldUpdatesDict["CreatedAt"];
-        delete fieldUpdatesDict["UpdatedAt"];
-        let params = this._buildBaseParams(hashKeyValue, sortKeyValue);
+        delete updatedFields["CreatedAt"];
+        delete updatedFields["UpdatedAt"];
+        let params = this._buildBaseParams(hashKey, sortKey);
         params.UpdateExpression = `SET ${
           isVersionned
             ? "Latest = if_not_exists(Latest, :defaultval) + :incrval,"
@@ -259,7 +204,7 @@ class Table {
 
         params.ReturnValues = "ALL_NEW";
 
-        Object.entries(fieldUpdatesDict).forEach((element, index, array) => {
+        Object.entries(updatedFields).forEach((element, index, array) => {
           const fieldName = element[0];
           const fieldNewValue = element[1];
           const valuePlaceholder = `:f${index}`;
@@ -282,10 +227,10 @@ class Table {
     });
   }
 
-  delete(hashKeyValue, sortKeyValue) {
+  delete({ hashKey, sortKey }) {
     return new Promise((resolve, reject) => {
       try {
-        const params = this._buildBaseParams(hashKeyValue, sortKeyValue);
+        const params = this._buildBaseParams(hashKey, sortKey);
         this.docClient.delete(params, (err, data) => {
           if (err) {
             reject(err);
