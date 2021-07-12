@@ -4,13 +4,17 @@ const mockAWSLib = () => {
   const mockPut = jest.fn();
   const mockUpdate = jest.fn();
   const mockDelete = jest.fn();
+  const mockConstructor = jest.fn();
 
   const mockDocClient = class C {
+    constructor(options) {
+      mockConstructor(options);
+    }
     get = mockGet;
     query = mockQuery;
     put = mockPut;
     update = mockUpdate;
-    mockDelete = mockDelete;
+    delete = mockDelete;
   };
 
   const mockAWS = {
@@ -19,7 +23,17 @@ const mockAWSLib = () => {
     },
   };
 
-  return { mockAWS, mockedFunctions: { get: mockGet } };
+  return {
+    mockAWS,
+    mockedFunctions: {
+      documentClientConstructor: mockConstructor,
+      get: mockGet,
+      query: mockQuery,
+      put: mockPut,
+      update: mockUpdate,
+      delete: mockDelete,
+    },
+  };
 };
 
 exports.mockAWSLib = mockAWSLib;

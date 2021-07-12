@@ -1,3 +1,4 @@
+const versionRegex = /v[0-9]+/g;
 class Table {
   constructor({ config, AWS }) {
     this.config = config;
@@ -17,35 +18,70 @@ class Table {
     this.docClient = new AWS.DynamoDB.DocumentClient(awsConfig);
   }
 
-  _buildBaseParams(hashKeyValue, sortKeyValue) {
+  _buildBaseParams(hashKey, sortKey) {
     let params = {
       TableName: this.config.tableName,
       Key: {},
     };
-    params.Key[this.config.hashKey] = hashKeyValue;
-    params.Key[this.config.sortKey] = sortKeyValue;
+    params.Key[this.config.hashKey] = hashKey;
+    params.Key[this.config.sortKey] = sortKey;
 
     return params;
   }
 
-  _buildSecondaryIndexParams(indexName, hashKeyValue, sortKeyValue) {
+  /**
+   *
+   * @param {*} indexName Secondary index name
+   * @param {*} hashKey Value of the hash key
+   * @param {*} sortKey Value of the sort key
+   * @param {*} filter Filter object with 2 properties:
+   *  'expression' which should be a filter expression
+   *  'attributes' which should be an object where each property is a value in the filter expression
+   *  Example:
+   *  {
+   *    expression: 'Active = :active:',
+   *    attributes: {
+   *      active: 1
+   *    }
+   *  }
+   * @returns
+   */
+  _buildQueryParams(indexName, hashKey, sortKey, filter) {
     const params = {
       TableName: this.config.tableName,
-      IndexName: indexName,
       KeyConditionExpression: "#pk = :pkv",
-      ExpressionAttributeNames: {
-        "#pk": this.config.indexes[indexName].hashKey,
-      },
+      ExpressionAttributeNames: {},
       ExpressionAttributeValues: {
-        ":pkv": hashKeyValue,
+        ":pkv": hashKey,
       },
     };
 
-    if (sortKeyValue) {
-      params.KeyConditionExpression += " and #skv = :skv";
-      params.ExpressionAttributeNames["#skv"] =
-        this.config.indexes[indexName].sortKey;
-      params.ExpressionAttributeValues[":skv"] = sortKeyValue;
+    if (indexName) {
+      params.IndexName = indexName;
+      params.ExpressionAttributeNames["#pk"] =
+        this.config.indexes[indexName].hashKey;
+
+      if (sortKey) {
+        params.KeyConditionExpression += " and #skv = :skv";
+        params.ExpressionAttributeNames["#skv"] =
+          this.config.indexes[indexName].sortKey;
+        params.ExpressionAttributeValues[":skv"] = sortKey;
+      }
+    } else {
+      params.ExpressionAttributeNames["#pk"] = this.config.hashKey;
+
+      if (sortKey) {
+        params.KeyConditionExpression += " and #skv = :skv";
+        params.ExpressionAttributeNames["#skv"] = this.config.sortKey;
+        params.ExpressionAttributeValues[":skv"] = sortKey;
+      }
+    }
+
+    if (filter) {
+      params.FilterExpression = filter.expression;
+      Object.entries(filter.attributes).forEach(([key, value], _) => {
+        params.ExpressionAttributeValues[`:${key}`] = value;
+      });
     }
 
     return params;
@@ -55,20 +91,11 @@ class Table {
     return this.config;
   }
 
-  getByPartitionKey(hashKeyValue) {
+  get({ hashKey, sortKey }) {
     return new Promise((resolve, reject) => {
       try {
-        const params = {
-          TableName: this.config.tableName,
-          KeyConditionExpression: "#pk = :pkv",
-          ExpressionAttributeNames: {
-            "#pk": this.config.hashKey,
-          },
-          ExpressionAttributeValues: {
-            ":pkv": hashKeyValue,
-          },
-        };
-        this.docClient.query(params, function (err, data) {
+        const params = this._buildBaseParams(hashKey, sortKey);
+        this.docClient.get(params, function (err, data) {
           if (err) {
             reject(err);
           } else {
@@ -81,20 +108,21 @@ class Table {
     });
   }
 
-  getBySecondaryIndex(indexName, hashKeyValue, sortKeyValue) {
+  /**
+   * Queries for items
+   * @param {*} hashKey Hash key of the table
+   * @param {*} sortKey Sort key of the table
+   * @param {*} filter Filter object. Should contain 'expression' and 'attributes' properties.
+   * @returns A promise which should resolve with data fetched by using the argument provided or an error
+   */
+  query({ hashKey, sortKey, indexName, filter }) {
     return new Promise((resolve, reject) => {
       try {
-        if (
-          !("indexes" in this.config) ||
-          !(indexName in this.config.indexes)
-        ) {
-          reject("Secondary index not found.");
-        }
-
-        const params = this._buildSecondaryIndexParams(
+        const params = this._buildQueryParams(
           indexName,
-          hashKeyValue,
-          sortKeyValue
+          hashKey,
+          sortKey,
+          filter
         );
 
         this.docClient.query(params, function (err, data) {
@@ -110,35 +138,30 @@ class Table {
     });
   }
 
-  get(hashKeyValue, sortKeyValue) {
+  create({ hashKey, sortKey, record }) {
+    const isVersionned = this.config.tableName.endsWith("_versions");
+    if (isVersionned && !sortKey.match(versionRegex)) {
+      throw new Error(
+        `Sort key '${sortKey}' doesn't match expected pattern ${versionRegex}`
+      );
+    }
     return new Promise((resolve, reject) => {
       try {
-        const params = this._buildBaseParams(hashKeyValue, sortKeyValue);
-        this.docClient.get(params, function (err, data) {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(data);
-          }
-        });
-      } catch (exc) {
-        reject(exc);
-      }
-    });
-  }
-
-  create(hashKeyValue, sortKeyValue, recordAttributesObject) {
-    return new Promise((resolve, reject) => {
-      try {
-        let params = this._buildBaseParams(hashKeyValue, sortKeyValue);
+        let params = this._buildBaseParams(hashKey, sortKey);
         delete params.Key;
 
         const dateStr = new Date().toISOString();
-        params.Item = recordAttributesObject;
-        params.Item["CreatedAt"] = dateStr;
+        params.Item = record;
         params.Item["UpdatedAt"] = dateStr;
-        params.Item[this.config.hashKey] = hashKeyValue;
-        params.Item[this.config.sortKey] = sortKeyValue;
+
+        if (isVersionned) {
+          params.Item["Latest"] = 0;
+        } else {
+          params.Item["CreatedAt"] = dateStr;
+        }
+
+        params.Item[this.config.hashKey] = hashKey;
+        params.Item[this.config.sortKey] = sortKey;
         params.ReturnValues = "ALL_OLD";
         this.docClient.put(params, (err, data) => {
           if (err) {
@@ -153,23 +176,39 @@ class Table {
     });
   }
 
-  update(hashKeyValue, sortKeyValue, fieldUpdatesDict) {
+  update({ hashKey, sortKey, updatedFields }) {
+    const isVersionned = this.config.tableName.endsWith("_versions");
+    if (isVersionned && sortKey != "v0") {
+      throw new Error(
+        "You can only update records with version 'v0' when table is using versionning."
+      );
+    }
     return new Promise((resolve, reject) => {
       try {
-        delete fieldUpdatesDict["CreatedAt"];
-        delete fieldUpdatesDict["UpdatedAt"];
-        let params = this._buildBaseParams(hashKeyValue, sortKeyValue);
-        params.UpdateExpression = `set UpdatedAt = :sfUpdatedAt,`;
+        delete updatedFields["CreatedAt"];
+        delete updatedFields["UpdatedAt"];
+        let params = this._buildBaseParams(hashKey, sortKey);
+        params.UpdateExpression = `SET ${
+          isVersionned
+            ? "Latest = if_not_exists(Latest, :defaultval) + :incrval,"
+            : ""
+        } UpdatedAt = :sfUpdatedAt,`;
         params.ExpressionAttributeValues = {
           ":sfUpdatedAt": new Date().toISOString(),
         };
+
+        if (isVersionned) {
+          params.ExpressionAttributeValues[":defaultval"] = 0;
+          params.ExpressionAttributeValues[":incrval"] = 1;
+        }
+
         params.ReturnValues = "ALL_NEW";
 
-        Object.entries(fieldUpdatesDict).forEach((element, index, array) => {
+        Object.entries(updatedFields).forEach((element, index, array) => {
           const fieldName = element[0];
           const fieldNewValue = element[1];
           const valuePlaceholder = `:f${index}`;
-          params.UpdateExpression += `${fieldName} = ${valuePlaceholder}${
+          params.UpdateExpression += ` ${fieldName} = ${valuePlaceholder}${
             index + 1 < array.length ? "," : ""
           }`;
           params.ExpressionAttributeValues[valuePlaceholder] = fieldNewValue;
@@ -188,10 +227,10 @@ class Table {
     });
   }
 
-  delete(hashKeyValue, sortKeyValue) {
+  delete({ hashKey, sortKey }) {
     return new Promise((resolve, reject) => {
       try {
-        const params = this._buildBaseParams(hashKeyValue, sortKeyValue);
+        const params = this._buildBaseParams(hashKey, sortKey);
         this.docClient.delete(params, (err, data) => {
           if (err) {
             reject(err);
@@ -206,60 +245,6 @@ class Table {
   }
 }
 
-const defaultMapper = {
-  map: (dynamoDbItem) => {
-    return dynamoDbItem;
-  },
-};
-
-const tableConfigs = {
-  loadtests: {
-    tableName: "loadtests",
-    hashKey: "OrganisationId",
-    sortKey: "LoadtestId",
-    indexes: {
-      PlaybookLoadtestIndex: {
-        hashKey: "PlaybookId",
-        sortKey: "LoadtestId",
-      },
-      UsersLoadtestsIndex: {
-        hashKey: "UserId",
-        sortKey: "LoadtestId",
-      },
-      CreatedAtHourIndex: {
-        hashKey: "CreatedAtHour",
-        sortKey: "MetricsSavedDate",
-      },
-    },
-  },
-  playbooks: {
-    tableName: "playbooks",
-    hashKey: "OrganisationId",
-    sortKey: "PlaybookId",
-  },
-  organisations: {
-    tableName: "organisations",
-    hashKey: "OrganisationId",
-    sortKey: "UserId",
-    indexes: {
-      UserOrganisations: {
-        hashKey: "UserId",
-        sortKey: "OrganisationId",
-      },
-    },
-  },
-  domains: {
-    tableName: "domains",
-    hashKey: "OrganisationId",
-    sortKey: "DomainName",
-    mapper: defaultMapper,
-  },
-  loadtest_metrics: {
-    tableName: "loadtest_metrics",
-    hashKey: "LoadtestId",
-    sortKey: "MetricName",
-  },
-};
-
 exports.Table = Table;
+const { tableConfigs } = require("./tableConfigs");
 exports.tableConfigs = tableConfigs;
