@@ -5,7 +5,6 @@ Lambdas providing CRUD operations on data stored in DynamoDB.
 - user
 - organisation
 - domain
-- playbook
 - loadtest
 - metrics
 

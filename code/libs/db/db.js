@@ -13,7 +13,7 @@ class Table {
         ] = `http://${process.env.LOCALSTACK_HOSTNAME}:4566`;
       }
     } catch (errEnv) {
-      console.log("Unable to retrieve 'env'", err);
+      console.log("Unable to retrieve 'env'", errEnv);
     }
     this.docClient = new AWS.DynamoDB.DocumentClient(awsConfig);
   }
@@ -177,6 +177,7 @@ class Table {
   }
 
   update({ hashKey, sortKey, updatedFields }) {
+    const record = { ...updatedFields };
     const isVersionned = this.config.tableName.endsWith("_versions");
     if (isVersionned && sortKey != "v0") {
       throw new Error(
@@ -185,8 +186,8 @@ class Table {
     }
     return new Promise((resolve, reject) => {
       try {
-        delete updatedFields["CreatedAt"];
-        delete updatedFields["UpdatedAt"];
+        if ("CreatedAt" in record) delete record["CreatedAt"];
+        if ("UpdatedAt" in record) delete record["UpdatedAt"];
         let params = this._buildBaseParams(hashKey, sortKey);
         params.UpdateExpression = `SET ${
           isVersionned
@@ -204,7 +205,7 @@ class Table {
 
         params.ReturnValues = "ALL_NEW";
 
-        Object.entries(updatedFields).forEach((element, index, array) => {
+        Object.entries(record).forEach((element, index, array) => {
           const fieldName = element[0];
           const fieldNewValue = element[1];
           const valuePlaceholder = `:f${index}`;

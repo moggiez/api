@@ -1,6 +1,6 @@
 {
   "name": "moggies-lambda-helpers",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Helper functions for AWS Lambdas.",
   "main": "lambda_helpers.js",
   "repository": {

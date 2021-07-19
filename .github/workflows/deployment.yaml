@@ -133,8 +133,5 @@ jobs:
       - name: Deploy organisation_api
         run: FUNC_NAME=organisation_api make update-lambda-fn
 
-      - name: Deploy playbook_api
-        run: FUNC_NAME=playbook_api make update-lambda-fn
-
       - name: Deploy user_api
         run: FUNC_NAME=user_api make update-lambda-fn

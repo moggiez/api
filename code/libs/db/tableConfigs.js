@@ -24,11 +24,6 @@ exports.tableConfigs = {
       },
     },
   },
-  playbooks: {
-    tableName: "playbooks",
-    hashKey: "OrganisationId",
-    sortKey: "PlaybookId",
-  },
   playbook_versions: {
     tableName: "playbook_versions",
     hashKey: "PlaybookId",

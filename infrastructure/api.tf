@@ -20,30 +20,6 @@ locals {
   authorizer = local.authorization_enabled ? aws_api_gateway_authorizer._ : null
 }
 
-# PLAYBOOK API
-module "playbook_lambda_api" {
-  source         = "git@github.com:moggiez/terraform-modules.git//lambda_api"
-  name           = "playbook"
-  api            = aws_api_gateway_rest_api._
-  dynamodb_table = "playbooks"
-  path_part      = "playbook"
-  bucket         = aws_s3_bucket.api_bucket
-  http_methods   = local.http_methods
-  dist_dir       = "../dist"
-  authorizer     = local.authorizer
-  environment    = local.environment
-}
-
-module "playbook_lambda_api_proxy" {
-  source              = "git@github.com:moggiez/terraform-modules.git//api_resource_proxy"
-  api                 = aws_api_gateway_rest_api._
-  http_methods        = local.http_methods
-  parent_api_resource = module.playbook_lambda_api.api_resource
-  lambda              = module.playbook_lambda_api.lambda
-  authorizer          = local.authorizer
-}
-# END PLAYBOOK API
-
 # LOADTEST API
 module "loadtest_lambda_api" {
   source         = "git@github.com:moggiez/terraform-modules.git//lambda_api"
@@ -165,7 +141,6 @@ module "metrics_lambda_api" {
   policies = [
     aws_iam_policy.cloudwatch_metrics_read_access.arn,
     aws_iam_policy.dynamodb_access_loadtests.arn,
-    aws_iam_policy.dynamodb_access_playbooks.arn,
     aws_iam_policy.dynamodb_access_organisations.arn,
     aws_iam_policy.dynamodb_access_loadtest_metrics.arn
   ]
@@ -189,7 +164,6 @@ resource "aws_api_gateway_deployment" "api_deployment" {
   for_each = local.stages
 
   depends_on = [
-    module.playbook_lambda_api,
     module.loadtest_lambda_api,
     module.domain_lambda_api,
     module.organisation_lambda_api,

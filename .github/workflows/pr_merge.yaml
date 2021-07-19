@@ -38,7 +38,7 @@ jobs:
       - name: Login to NPM
         run: make npm-auth
 
-      - name: Build lambdas dev
+      - name: Build lambdas and libs dev
         run: make build-dev
 
       - name: Install NPM modules

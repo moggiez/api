@@ -29,7 +29,7 @@ exports.getRequestFromEvent = (event) => {
   return {
     httpMethod: httpMethod,
     body: JSON.parse(event.body),
-    pathParameters: pathParams,
+    pathParameters: event.pathParameters,
     getPathParamAtIndex: getPathParamAtIndex,
   };
 };
