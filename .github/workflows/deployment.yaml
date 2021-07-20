@@ -126,6 +126,3 @@ jobs:
 
       - name: Deploy metrics_api
         run: FUNC_NAME=metrics_api make update-lambda-fn
-
-      - name: Deploy organisation_api
-        run: FUNC_NAME=organisation_api make update-lambda-fn

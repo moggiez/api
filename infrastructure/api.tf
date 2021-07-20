@@ -45,31 +45,6 @@ module "loadtest_lambda_api_proxy" {
 
 # END LOADTEST API
 
-# ORGANISATION API
-module "organisation_lambda_api" {
-  source         = "git@github.com:moggiez/terraform-modules.git//lambda_api"
-  name           = "organisation"
-  api            = aws_api_gateway_rest_api._
-  dynamodb_table = "organisations"
-  path_part      = "organisation"
-  bucket         = aws_s3_bucket.api_bucket
-  http_methods   = local.http_methods
-  dist_dir       = "../dist"
-  authorizer     = local.authorizer
-  environment    = local.environment
-}
-
-module "organisation_lambda_api_proxy" {
-  source              = "git@github.com:moggiez/terraform-modules.git//api_resource_proxy"
-  api                 = aws_api_gateway_rest_api._
-  http_methods        = local.http_methods
-  parent_api_resource = module.organisation_lambda_api.api_resource
-  lambda              = module.organisation_lambda_api.lambda
-  authorizer          = local.authorizer
-}
-
-# END ORGANISATION API
-
 # METRICS API
 resource "aws_iam_policy" "cloudwatch_metrics_read_access" {
   name        = "metrics_api-CloudWatchMetricsReadAccess"
@@ -91,7 +66,6 @@ module "metrics_lambda_api" {
   policies = [
     aws_iam_policy.cloudwatch_metrics_read_access.arn,
     aws_iam_policy.dynamodb_access_loadtests.arn,
-    aws_iam_policy.dynamodb_access_organisations.arn,
     aws_iam_policy.dynamodb_access_loadtest_metrics.arn
   ]
   authorizer  = local.authorizer
@@ -115,7 +89,6 @@ resource "aws_api_gateway_deployment" "api_deployment" {
 
   depends_on = [
     module.loadtest_lambda_api,
-    module.organisation_lambda_api,
     module.metrics_lambda_api
   ]
 
