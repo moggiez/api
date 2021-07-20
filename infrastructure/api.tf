@@ -95,31 +95,6 @@ module "domain_lambda_api_proxy" {
 
 # END DOMAIN API
 
-# USER API
-module "user_lambda_api" {
-  source         = "git@github.com:moggiez/terraform-modules.git//lambda_api"
-  name           = "user"
-  api            = aws_api_gateway_rest_api._
-  dynamodb_table = "organisations"
-  path_part      = "user"
-  bucket         = aws_s3_bucket.api_bucket
-  http_methods   = local.http_methods
-  dist_dir       = "../dist"
-  authorizer     = local.authorizer
-  environment    = local.environment
-}
-
-module "user_lambda_api_proxy" {
-  source              = "git@github.com:moggiez/terraform-modules.git//api_resource_proxy"
-  api                 = aws_api_gateway_rest_api._
-  http_methods        = local.http_methods
-  parent_api_resource = module.user_lambda_api.api_resource
-  lambda              = module.user_lambda_api.lambda
-  authorizer          = local.authorizer
-}
-
-# END USER API
-
 # METRICS API
 resource "aws_iam_policy" "cloudwatch_metrics_read_access" {
   name        = "metrics_api-CloudWatchMetricsReadAccess"
@@ -167,7 +142,6 @@ resource "aws_api_gateway_deployment" "api_deployment" {
     module.loadtest_lambda_api,
     module.domain_lambda_api,
     module.organisation_lambda_api,
-    module.user_lambda_api,
     module.metrics_lambda_api
   ]
 
