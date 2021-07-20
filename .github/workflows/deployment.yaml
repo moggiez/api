@@ -121,9 +121,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
           aws-region: eu-west-1
 
-      - name: Deploy domain_api
-        run: FUNC_NAME=domain_api make update-lambda-fn
-
       - name: Deploy loadtest_api
         run: FUNC_NAME=loadtest_api make update-lambda-fn
 
@@ -132,6 +129,3 @@ jobs:
 
       - name: Deploy organisation_api
         run: FUNC_NAME=organisation_api make update-lambda-fn
-
-      - name: Deploy user_api
-        run: FUNC_NAME=user_api make update-lambda-fn

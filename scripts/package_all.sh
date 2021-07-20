@@ -9,7 +9,7 @@ LOCAL_ENV=prod
    LOCAL_ENV=dev ||
    LOCAL_ENV=prod
 
-APIS=("organisation" "domain" "loadtest" "metrics")
+APIS=("organisation" "loadtest" "metrics")
 PACKAGES=("db" "auth" "lambda_helpers" "metrics")
 
 for api in "${APIS[@]}"
