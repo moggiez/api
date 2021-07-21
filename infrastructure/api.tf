@@ -20,31 +20,6 @@ locals {
   authorizer = local.authorization_enabled ? aws_api_gateway_authorizer._ : null
 }
 
-# LOADTEST API
-module "loadtest_lambda_api" {
-  source         = "git@github.com:moggiez/terraform-modules.git//lambda_api"
-  name           = "loadtest"
-  api            = aws_api_gateway_rest_api._
-  dynamodb_table = "loadtests"
-  path_part      = "loadtest"
-  bucket         = aws_s3_bucket.api_bucket
-  http_methods   = local.http_methods
-  dist_dir       = "../dist"
-  authorizer     = local.authorizer
-  environment    = local.environment
-}
-
-module "loadtest_lambda_api_proxy" {
-  source              = "git@github.com:moggiez/terraform-modules.git//api_resource_proxy"
-  api                 = aws_api_gateway_rest_api._
-  http_methods        = local.http_methods
-  parent_api_resource = module.loadtest_lambda_api.api_resource
-  lambda              = module.loadtest_lambda_api.lambda
-  authorizer          = local.authorizer
-}
-
-# END LOADTEST API
-
 # METRICS API
 resource "aws_iam_policy" "cloudwatch_metrics_read_access" {
   name        = "metrics_api-CloudWatchMetricsReadAccess"
@@ -88,7 +63,6 @@ resource "aws_api_gateway_deployment" "api_deployment" {
   for_each = local.stages
 
   depends_on = [
-    module.loadtest_lambda_api,
     module.metrics_lambda_api
   ]
 
