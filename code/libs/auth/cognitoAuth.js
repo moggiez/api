@@ -28,7 +28,11 @@ exports.getUserFromEvent = (event) => {
   }
 
   try {
-    return env == "local" ? getFakeAuth() : getUserFromClaims(event);
+    const user = env == "local" ? getFakeAuth() : getUserFromClaims(event);
+    if (event.headers && event.headers.Authorization) {
+      user.authorization = event.headers.Authorization;
+    }
+    return user;
   } catch (err) {
     return null;
   }

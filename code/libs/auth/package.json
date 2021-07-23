@@ -1,6 +1,6 @@
 {
   "name": "moggies-auth",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Utility functions for AWS Lambdas with authorization.",
   "main": "cognitoAuth.js",
   "repository": {
@@ -28,6 +28,9 @@
     "format": "prettier --write ."
   },
   "jest": {
+    "testMatch": [
+      "<rootDir>/**/__tests__/*.test.js"
+    ],
     "testPathIgnorePatterns": [
       "__tests__/helpers.js"
     ]
